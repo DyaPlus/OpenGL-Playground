@@ -5,3 +5,10 @@ layout(location = 0) in vec4 position;
 void main() {
     gl_Position = position;
 };
+
+#shader fragment
+#version 330 core
+out vec3 color;
+void main() {
+    color = vec3(1, 0, 0);
+}

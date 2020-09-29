@@ -1,9 +1,9 @@
 #define GLEW_STATIC
+#include "Shader.h"
 #include "GLEW/include/GL/glew.h"
 #include "GLFW/include/GLFW/glfw3.h"
 #include <iostream>
 #include <string>
-#include "Shader.h"
 
 void InitGLFW()
 {
@@ -72,11 +72,10 @@ int main(void)
         0,                  // stride
         (void*)0            // array buffer offset
     );
-    ShaderSource Source;
-    GLuint programID = LoadShader("src\\vertex.shader", Source);
-    programID = LoadShader("src\\fragment.shader", Source);
+    Shader BasicShader("src\\basic.glsl");
+    
     // Use our shader
-    glUseProgram(programID);
+    BasicShader.Bind();
 
     while (!glfwWindowShouldClose(window))
     {

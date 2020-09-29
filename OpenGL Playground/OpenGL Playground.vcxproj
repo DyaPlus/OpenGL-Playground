@@ -147,10 +147,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\fragment.shader" />
-    <None Include="src\vertex.shader" />
+    <None Include="src\basic.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Shader.h" />
