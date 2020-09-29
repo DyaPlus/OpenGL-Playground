@@ -45,29 +45,32 @@ int main(void)
     glfwMakeContextCurrent(window); 
     InitGLEW();
 
-    GLuint vaID;
-    glGenVertexArrays(1, &vaID);
-    glBindVertexArray(vaID);
+    GLuint VAO;
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
 
-    // An array of 3 vectors which represents 3 vertices
-    static const GLfloat g_vertex_buffer_data[] = {
-       -1.0f, -1.0f, 0.0f,
-       1.0f, -1.0f, 0.0f,
-       0.0f,  1.0f, 0.0f,
+    float vertices[] = {
+     0.5f,  0.5f, 0.0f,  // top right
+     0.5f, -0.5f, 0.0f,  // bottom right
+    -0.5f, -0.5f, 0.0f,  // bottom left
+    -0.5f,  0.5f, 0.0f   // top left 
+    };
+    unsigned int indices[] = {  // note that we start from 0!
+        0, 1, 3,   // first triangle
+        1, 2, 3    // second triangle
     };
 
     // This will identify our vertex buffer
-    GLuint vbID;
+    GLuint VBO_pos;
     // Generate 1 buffer, put the resulting identifier in vertexbuffer
-    glGenBuffers(1, &vbID);
+    glGenBuffers(1, &VBO_pos);
     // The following commands will talk about our 'vertexbuffer' buffer
-    glBindBuffer(GL_ARRAY_BUFFER, vbID);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO_pos);
     // Give our vertices to OpenGL.
-    glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
-
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     // 1st attribute buffer : vertices
     glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, vbID);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO_pos);
     glVertexAttribPointer(
         0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
         3,                  // size
@@ -76,6 +79,11 @@ int main(void)
         0,                  // stride
         (void*)0            // array buffer offset
     );
+
+    unsigned int EBO;
+    glGenBuffers(1, &EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     Shader BasicShader("src\\basic.glsl");
     // Use our shader
@@ -86,7 +94,7 @@ int main(void)
     glm::mat4 Projection = glm::perspective(glm::radians(90.0f), (float)width / (float)height, 0.1f, 100.0f);
     // Camera matrix
     glm::mat4 View = glm::lookAt(
-        glm::vec3(4, 3, 3), // Camera is at (4,3,3), in World Space
+        glm::vec3(2, 1, 1), // Camera is at (4,3,3), in World Space
         glm::vec3(0, 0, 0), // and looks at the origin
         glm::vec3(0, 1, 0)  // Head is up (set to 0,-1,0 to look upside-down)
     );
@@ -104,8 +112,9 @@ int main(void)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         
-		// Draw the triangle !
-		glDrawArrays(GL_TRIANGLES, 0, 3); // Starting from vertex 0; 3 vertices total -> 1 triangle
+		// Draw 
+		//glDrawArrays(GL_TRIANGLES, 0, 3); // Starting from vertex 0; 3 vertices total -> 1 triangle
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
