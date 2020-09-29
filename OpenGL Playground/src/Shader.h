@@ -15,9 +15,9 @@ struct ShaderSource {
 
 class Shader {
 private:
-	GLuint m_ID;
 	ShaderSource m_SrcCode;
 public:
+	GLuint m_ID;
 	Shader(const std::string& filepath);
 	Shader(const ShaderSource src_code);
 	void Bind() const;

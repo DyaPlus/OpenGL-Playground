@@ -4,6 +4,7 @@
 #include "GLFW/include/GLFW/glfw3.h"
 #include <iostream>
 #include <string>
+#include "vendor/glm/gtc/matrix_transform.hpp"
 
 void InitGLFW()
 {
@@ -27,12 +28,15 @@ void InitGLEW()
         fprintf(stderr, "Failed to initialize GLEW\n");
     }
 }
+
 int main(void)
 {
     InitGLFW();
     // Open a window and create its OpenGL context
     GLFWwindow* window; // (In the accompanying source code, this variable is global for simplicity)
-    window = glfwCreateWindow(1024, 768, "Tutorial 01", NULL, NULL);
+    int width = 1024;
+    int height = 768;
+    window = glfwCreateWindow(width, height, "Tutorial 01", NULL, NULL);
     if (window == NULL) {
         fprintf(stderr, "Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n");
         glfwTerminate();
@@ -72,10 +76,26 @@ int main(void)
         0,                  // stride
         (void*)0            // array buffer offset
     );
+
     Shader BasicShader("src\\basic.glsl");
-    
     // Use our shader
     BasicShader.Bind();
+
+    
+    // Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
+    glm::mat4 Projection = glm::perspective(glm::radians(90.0f), (float)width / (float)height, 0.1f, 100.0f);
+    // Camera matrix
+    glm::mat4 View = glm::lookAt(
+        glm::vec3(4, 3, 3), // Camera is at (4,3,3), in World Space
+        glm::vec3(0, 0, 0), // and looks at the origin
+        glm::vec3(0, 1, 0)  // Head is up (set to 0,-1,0 to look upside-down)
+    );
+    // Model matrix : an identity matrix (model will be at the origin)
+    glm::mat4 Model = glm::mat4(1.0f);
+
+    glm::mat4 MVP = Projection * View * Model;
+    GLuint MatrixID = glGetUniformLocation(BasicShader.m_ID, "MVP");
+    glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 
     while (!glfwWindowShouldClose(window))
     {
