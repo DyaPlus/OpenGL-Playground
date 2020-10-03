@@ -12,6 +12,7 @@ struct Image
 Image load_image(const char* filepath)
 {
     int width, height, nrChannels;
+    stbi_set_flip_vertically_on_load(true);
     unsigned char* data = stbi_load(filepath, &width, &height, &nrChannels, 0);
     return Image(data, width, height, nrChannels);
 }
