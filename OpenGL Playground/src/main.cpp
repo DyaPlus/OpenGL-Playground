@@ -1,5 +1,6 @@
 #define GLEW_STATIC
 #include "Shader.h"
+#include "Texture2D.h"
 #include "GLEW/include/GL/glew.h"
 #include "GLFW/include/GLFW/glfw3.h"
 #include <iostream>
@@ -50,10 +51,11 @@ int main(void)
     glBindVertexArray(VAO);
 
     float vertices[] = {
-     0.5f,  0.5f, 0.0f,  // top right
-     0.5f, -0.5f, 0.0f,  // bottom right
-    -0.5f, -0.5f, 0.0f,  // bottom left
-    -0.5f,  0.5f, 0.0f   // top left 
+        // positions          // colors           // texture coords
+         0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
+         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
+        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
     };
     unsigned int indices[] = {  // note that we start from 0!
         0, 1, 3,   // first triangle
@@ -61,24 +63,26 @@ int main(void)
     };
 
     // This will identify our vertex buffer
-    GLuint VBO_pos;
+    GLuint VBO;
     // Generate 1 buffer, put the resulting identifier in vertexbuffer
-    glGenBuffers(1, &VBO_pos);
+    glGenBuffers(1, &VBO);
     // The following commands will talk about our 'vertexbuffer' buffer
-    glBindBuffer(GL_ARRAY_BUFFER, VBO_pos);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
     // Give our vertices to OpenGL.
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     // 1st attribute buffer : vertices
     glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO_pos);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glVertexAttribPointer(
         0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
         3,                  // size
         GL_FLOAT,           // type
         GL_TRUE,           // normalized?
-        0,                  // stride
-        (void*)0            // array buffer offset
+        8 * sizeof(float),  // stride (Can't be zero if there is anoter attrib pointer)
+        (void*)0            // array buffer offset (If the selected attribute isn't the starting data)
     );
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 
     unsigned int EBO;
     glGenBuffers(1, &EBO);
@@ -86,15 +90,16 @@ int main(void)
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     Shader BasicShader("src\\basic.glsl");
-    // Use our shader
     BasicShader.Bind();
 
-    
+    Texture2D CeramicTex("src\\ceramic.jpg");
+    CeramicTex.Bind();
+
     // Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
     glm::mat4 Projection = glm::perspective(glm::radians(90.0f), (float)width / (float)height, 0.1f, 100.0f);
     // Camera matrix
     glm::mat4 View = glm::lookAt(
-        glm::vec3(2, 1, 1), // Camera is at (4,3,3), in World Space
+        glm::vec3(0, 0.3, 1), // Camera is at (4,3,3), in World Space
         glm::vec3(0, 0, 0), // and looks at the origin
         glm::vec3(0, 1, 0)  // Head is up (set to 0,-1,0 to look upside-down)
     );

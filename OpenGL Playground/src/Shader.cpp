@@ -34,11 +34,10 @@ void CompileShader(GLuint id)
 	GLint Result = GL_FALSE;
 	int InfoLogLength;
 
-	// Compile Vertex Shader
-	printf("Compiling vertex shader\n");
+	// Compile Shader
 	glCompileShader(id);
 
-	// Check Vertex Shader
+	// Check Shader Compilation Status
 	glGetShaderiv(id, GL_COMPILE_STATUS, &Result);
 	glGetShaderiv(id, GL_INFO_LOG_LENGTH, &InfoLogLength);
 	if (InfoLogLength > 0) {
