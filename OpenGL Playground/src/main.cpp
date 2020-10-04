@@ -7,10 +7,50 @@
 #include <string>
 #include "vendor/glm/gtc/matrix_transform.hpp"
 
+glm::vec3 camPos(0, 0, 4);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+bool firstMouse = true;
+float lastX = 0;
+float lastY = 0;
+float yaw;
+float pitch;
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+    if (firstMouse)
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos;
+    lastX = xpos;
+    lastY = ypos;
+
+    float sensitivity = 0.1f;
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    yaw += xoffset;
+    pitch += yoffset;
+
+    if (pitch > 89.0f)
+        pitch = 89.0f;
+    if (pitch < -89.0f)
+        pitch = -89.0f;
+
+    glm::vec3 direction;
+    direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+    direction.y = sin(glm::radians(pitch));
+    direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    cameraFront = glm::normalize(direction);
+}
+
 void UpdatePosition(glm::vec3 camPos,Shader shader)
 {
-    glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-    glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
     int width = 1024;
     int height = 768;
     // Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
@@ -67,7 +107,8 @@ int main(void)
     }
     glfwMakeContextCurrent(window); 
     InitGLEW();
-
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetCursorPosCallback(window, mouse_callback);
     GLuint VAO;
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
@@ -117,15 +158,20 @@ int main(void)
     Texture2D CeramicTex("src\\ceramic.jpg");
     CeramicTex.Bind();
 
-    glm::vec3 camPos(0, 0, 4);
-    glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-    glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-
     UpdatePosition(camPos, BasicShader);
-    const float cameraSpeed = 0.04f; // adjust accordingly
+    float cameraSpeed = 2.5f; // adjust accordingly
+
+    float deltaTime = 0.0f;	// Time between current frame and last frame
+    float lastFrame = 0.0f; // Time of last frame
+
+    
 
     while (!glfwWindowShouldClose(window))
     {
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+        cameraSpeed = 2.5f * deltaTime;
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
             camPos += cameraSpeed * cameraFront ;
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
