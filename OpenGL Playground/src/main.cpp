@@ -13,7 +13,7 @@ glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 bool firstMouse = true;
 float lastX = 0;
 float lastY = 0;
-float yaw;
+float yaw = -90;
 float pitch;
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
@@ -36,11 +36,14 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 
     yaw += xoffset;
     pitch += yoffset;
-
     if (pitch > 89.0f)
         pitch = 89.0f;
     if (pitch < -89.0f)
         pitch = -89.0f;
+    if (yaw >= 360 || yaw <= -360)
+    {
+        yaw = 0;
+    }
 
     glm::vec3 direction;
     direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
