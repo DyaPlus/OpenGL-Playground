@@ -7,6 +7,28 @@
 #include <string>
 #include "vendor/glm/gtc/matrix_transform.hpp"
 
+void UpdatePosition(glm::vec3 camPos,Shader shader)
+{
+    glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+    glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+    int width = 1024;
+    int height = 768;
+    // Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
+    glm::mat4 Projection = glm::perspective(glm::radians(90.0f), (float)width / (float)height, 0.1f, 100.0f);
+    // Camera matrix
+    
+    glm::mat4 View = glm::lookAt(
+        camPos, // Camera is at (4,3,3), in World Space
+        camPos + cameraFront, // and looks at the origin
+        cameraUp  // Head is up (set to 0,-1,0 to look upside-down)
+    );
+    // Model matrix : an identity matrix (model will be at the origin)
+    glm::mat4 Model = glm::mat4(1.0f);
+
+    glm::mat4 MVP = Projection * View * Model;
+    GLuint MatrixID = glGetUniformLocation(shader.m_ID, "MVP");
+    glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+}
 void InitGLFW()
 {
     //GLFW INIT
@@ -95,28 +117,28 @@ int main(void)
     Texture2D CeramicTex("src\\ceramic.jpg");
     CeramicTex.Bind();
 
-    // Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
-    glm::mat4 Projection = glm::perspective(glm::radians(90.0f), (float)width / (float)height, 0.1f, 100.0f);
-    // Camera matrix
-    glm::mat4 View = glm::lookAt(
-        glm::vec3(0, 0.3, 1), // Camera is at (4,3,3), in World Space
-        glm::vec3(0, 0, 0), // and looks at the origin
-        glm::vec3(0, 1, 0)  // Head is up (set to 0,-1,0 to look upside-down)
-    );
-    // Model matrix : an identity matrix (model will be at the origin)
-    glm::mat4 Model = glm::mat4(1.0f);
+    glm::vec3 camPos(0, 0, 4);
+    glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+    glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
-    glm::mat4 MVP = Projection * View * Model;
-    GLuint MatrixID = glGetUniformLocation(BasicShader.m_ID, "MVP");
-    glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+    UpdatePosition(camPos, BasicShader);
+    const float cameraSpeed = 0.04f; // adjust accordingly
 
     while (!glfwWindowShouldClose(window))
     {
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+            camPos += cameraSpeed * cameraFront ;
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+            camPos -= cameraSpeed * cameraFront;
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+            camPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+            camPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+        UpdatePosition(camPos, BasicShader);
 
         /* Render here */
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        
+ 
 		// Draw 
 		//glDrawArrays(GL_TRIANGLES, 0, 3); // Starting from vertex 0; 3 vertices total -> 1 triangle
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
