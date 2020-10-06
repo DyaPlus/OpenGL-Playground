@@ -13,7 +13,7 @@ glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 bool firstMouse = true;
 float lastX = 0;
 float lastY = 0;
-float yaw = -90;
+float yaw = 180;
 float pitch;
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
@@ -25,7 +25,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
         firstMouse = false;
     }
 
-    float xoffset = xpos - lastX;
+    float xoffset = lastX - xpos;
     float yoffset = lastY - ypos;
     lastX = xpos;
     lastY = ypos;
@@ -44,11 +44,12 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     {
         yaw = 0;
     }
-
+    
     glm::vec3 direction;
-    direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+    direction.x = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
     direction.y = sin(glm::radians(pitch));
-    direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    direction.z = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+    std::cout << lastX << std::endl;
     cameraFront = glm::normalize(direction);
 }
 
