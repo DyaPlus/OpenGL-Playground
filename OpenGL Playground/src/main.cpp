@@ -1,75 +1,31 @@
 #define GLEW_STATIC
 #include "Shader.h"
 #include "Texture2D.h"
+#include "Camera.h"
 #include "GLEW/include/GL/glew.h"
 #include "GLFW/include/GLFW/glfw3.h"
 #include <iostream>
 #include <string>
 #include "vendor/glm/gtc/matrix_transform.hpp"
 
-glm::vec3 camPos(0, 0, 4);
-glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-bool firstMouse = true;
-float lastX = 0;
-float lastY = 0;
-float yaw = 180;
-float pitch;
+int width = 1024;
+int height = 768;
+// Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
+glm::mat4 Projection = glm::perspective(glm::radians(90.0f), (float)width / (float)height, 0.1f, 100.0f);
+
+Camera cam(glm::vec3(0.0f, 0.0f, 4.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), 2.5f);
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
-    if (firstMouse)
-    {
-        lastX = xpos;
-        lastY = ypos;
-        firstMouse = false;
-    }
-
-    float xoffset = lastX - xpos;
-    float yoffset = lastY - ypos;
-    lastX = xpos;
-    lastY = ypos;
-
-    float sensitivity = 0.1f;
-    xoffset *= sensitivity;
-    yoffset *= sensitivity;
-
-    yaw += xoffset;
-    pitch += yoffset;
-    if (pitch > 89.0f)
-        pitch = 89.0f;
-    if (pitch < -89.0f)
-        pitch = -89.0f;
-    if (yaw >= 360 || yaw <= -360)
-    {
-        yaw = 0;
-    }
-    
-    glm::vec3 direction;
-    direction.x = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-    direction.y = sin(glm::radians(pitch));
-    direction.z = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-    std::cout << lastX << std::endl;
-    cameraFront = glm::normalize(direction);
+    cam.Update(xpos, ypos);
 }
 
-void UpdatePosition(glm::vec3 camPos,Shader shader)
+void UpdatePosition(Camera cam,Shader shader)
 {
-    int width = 1024;
-    int height = 768;
-    // Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
-    glm::mat4 Projection = glm::perspective(glm::radians(90.0f), (float)width / (float)height, 0.1f, 100.0f);
-    // Camera matrix
-    
-    glm::mat4 View = glm::lookAt(
-        camPos, // Camera is at (4,3,3), in World Space
-        camPos + cameraFront, // and looks at the origin
-        cameraUp  // Head is up (set to 0,-1,0 to look upside-down)
-    );
+  
     // Model matrix : an identity matrix (model will be at the origin)
     glm::mat4 Model = glm::mat4(1.0f);
-
-    glm::mat4 MVP = Projection * View * Model;
+    glm::mat4 MVP = Projection * cam.ViewMat() * Model;
     GLuint MatrixID = glGetUniformLocation(shader.m_ID, "MVP");
     glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 }
@@ -101,8 +57,6 @@ int main(void)
     InitGLFW();
     // Open a window and create its OpenGL context
     GLFWwindow* window; // (In the accompanying source code, this variable is global for simplicity)
-    int width = 1024;
-    int height = 768;
     window = glfwCreateWindow(width, height, "Tutorial 01", NULL, NULL);
     if (window == NULL) {
         fprintf(stderr, "Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n");
@@ -111,8 +65,10 @@ int main(void)
     }
     glfwMakeContextCurrent(window); 
     InitGLEW();
+    //TODO associate with a scene object
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPosCallback(window, mouse_callback);
+
     GLuint VAO;
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
@@ -162,10 +118,10 @@ int main(void)
     Texture2D CeramicTex("src\\ceramic.jpg");
     CeramicTex.Bind();
 
-    UpdatePosition(camPos, BasicShader);
+    UpdatePosition(cam, BasicShader);
     float cameraSpeed = 2.5f; // adjust accordingly
 
-    float deltaTime = 0.0f;	// Time between current frame and last frame
+    float deltatime = 0.0f;	// Time between current frame and last frame
     float lastFrame = 0.0f; // Time of last frame
 
     
@@ -173,18 +129,18 @@ int main(void)
     while (!glfwWindowShouldClose(window))
     {
         float currentFrame = glfwGetTime();
-        deltaTime = currentFrame - lastFrame;
+        deltatime = currentFrame - lastFrame;
         lastFrame = currentFrame;
-        cameraSpeed = 2.5f * deltaTime;
+
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-            camPos += cameraSpeed * cameraFront ;
+            cam.Forward(deltatime);
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-            camPos -= cameraSpeed * cameraFront;
+            cam.Backward(deltatime);
         if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-            camPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+            cam.Left(deltatime);
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-            camPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-        UpdatePosition(camPos, BasicShader);
+            cam.Right(deltatime);
+        UpdatePosition(cam, BasicShader);
 
         /* Render here */
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
