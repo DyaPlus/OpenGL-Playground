@@ -7,6 +7,8 @@
 #include <iostream>
 #include <string>
 #include "vendor/glm/gtc/matrix_transform.hpp"
+#include "CubeVertices.h"
+#include "Mesh.h"
 
 int width = 1024;
 int height = 768;
@@ -20,15 +22,13 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     cam.Update(xpos, ypos);
 }
 
-void UpdatePosition(Camera cam,Shader shader)
-{
-  
-    // Model matrix : an identity matrix (model will be at the origin)
-    glm::mat4 Model = glm::mat4(1.0f);
-    glm::mat4 MVP = Projection * cam.ViewMat() * Model;
-    GLuint MatrixID = glGetUniformLocation(shader.m_ID, "MVP");
+void UpdatePosition(Mesh &mesh)
+{  
+    glm::mat4 MVP = Projection * cam.ViewMat() * mesh.ModelMat();
+    GLuint MatrixID = glGetUniformLocation(mesh.m_ShaderToUse->m_ID, "MVP");
     glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 }
+
 void InitGLFW()
 {
     //GLFW INIT
@@ -69,58 +69,56 @@ int main(void)
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPosCallback(window, mouse_callback);
 
-    GLuint VAO;
+    /*GLuint VAO;
     glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
+    glBindVertexArray(VAO);*/
 
-    float vertices[] = {
-        // positions          // colors           // texture coords
-         0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
-         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
-    };
-    unsigned int indices[] = {  // note that we start from 0!
-        0, 1, 3,   // first triangle
-        1, 2, 3    // second triangle
-    };
+    //float vertices[] = {
+    //    // positions          // colors           // texture coords
+    //     0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
+    //     0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+    //    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
+    //    -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
+    //};
 
-    // This will identify our vertex buffer
-    GLuint VBO;
-    // Generate 1 buffer, put the resulting identifier in vertexbuffer
-    glGenBuffers(1, &VBO);
-    // The following commands will talk about our 'vertexbuffer' buffer
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    // Give our vertices to OpenGL.
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    // 1st attribute buffer : vertices
-    glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glVertexAttribPointer(
-        0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-        3,                  // size
-        GL_FLOAT,           // type
-        GL_TRUE,           // normalized?
-        8 * sizeof(float),  // stride (Can't be zero if there is anoter attrib pointer)
-        (void*)0            // array buffer offset (If the selected attribute isn't the starting data)
-    );
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
+    //unsigned int indices[] = {  // note that we start from 0!
+    //    0, 1, 3,   // first triangle
+    //    1, 2, 3    // second triangle
+    //};
 
-    unsigned int EBO;
+    //// This will identify our vertex buffer
+    //GLuint VBO;
+    //// Generate 1 buffer, put the resulting identifier in vertexbuffer
+    //glGenBuffers(1, &VBO);
+    //// The following commands will talk about our 'vertexbuffer' buffer
+    //glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    //// Give our vertices to OpenGL.
+    //glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    //// 1st attribute buffer : vertices
+    //glEnableVertexAttribArray(0);
+    //glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    //// position attribute                           //Stride           //Offset
+    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    //glEnableVertexAttribArray(0);
+    //// normal attribute
+    //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    //glEnableVertexAttribArray(1);
+
+   /* unsigned int EBO;
     glGenBuffers(1, &EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);*/
 
     Shader BasicShader("src\\basic.glsl");
     BasicShader.Bind();
 
-    Texture2D CeramicTex("src\\ceramic.jpg");
-    CeramicTex.Bind();
+    /*Texture2D CeramicTex("src\\ceramic.jpg");
+    CeramicTex.Bind();*/
 
-    UpdatePosition(cam, BasicShader);
+    Mesh cube(vertices, sizeof(vertices) / sizeof(vertices[0]), glm::vec3(0, 0, 0), &BasicShader);
+
+    UpdatePosition(cube);
     float cameraSpeed = 2.5f; // adjust accordingly
-
     float deltatime = 0.0f;	// Time between current frame and last frame
     float lastFrame = 0.0f; // Time of last frame
 
@@ -140,14 +138,14 @@ int main(void)
             cam.Left(deltatime);
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
             cam.Right(deltatime);
-        UpdatePosition(cam, BasicShader);
+        
 
         /* Render here */
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
  
 		// Draw 
-		//glDrawArrays(GL_TRIANGLES, 0, 3); // Starting from vertex 0; 3 vertices total -> 1 triangle
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        UpdatePosition(cube);
+        cube.Render();
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
