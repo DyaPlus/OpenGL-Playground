@@ -29,15 +29,16 @@ Mesh::Mesh(float* vertices,int length, glm::vec3 pos, Shader* shader)
 
 glm::mat4 Mesh::ModelMat()
 {
-    //return glm::translate(glm::mat4(1.0f),m_Pos);
-    return glm::mat4(1.0);
+    return glm::translate(glm::mat4(1.0f),m_Pos);
 }
 
 void Mesh::Render()
 {
     glBindVertexArray(m_ID);
+    m_ShaderToUse->Bind();
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
+    m_ShaderToUse->Unbind();
 }
 
 Mesh::~Mesh()

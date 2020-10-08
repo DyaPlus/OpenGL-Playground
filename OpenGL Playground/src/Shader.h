@@ -22,7 +22,6 @@ public:
 	Shader(const std::string& filepath);
 	Shader(const ShaderSource src_code);
 	void Bind() const;
-	void UseLight(Light light);
 	void Unbind() const;
 };
 

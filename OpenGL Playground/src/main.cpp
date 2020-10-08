@@ -9,6 +9,7 @@
 #include "vendor/glm/gtc/matrix_transform.hpp"
 #include "CubeVertices.h"
 #include "Mesh.h"
+#include "Light.h"
 
 int width = 1024;
 int height = 768;
@@ -26,7 +27,9 @@ void UpdatePosition(Mesh &mesh)
 {  
     glm::mat4 MVP = Projection * cam.ViewMat() * mesh.ModelMat();
     GLuint MatrixID = glGetUniformLocation(mesh.m_ShaderToUse->m_ID, "MVP");
-    glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+    mesh.m_ShaderToUse->Bind();
+    glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]); //Works on the current bound Shader only
+    mesh.m_ShaderToUse->Unbind();
 }
 
 void InitGLFW()
@@ -110,20 +113,25 @@ int main(void)
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);*/
 
     Shader BasicShader("src\\basic.glsl");
-    BasicShader.Bind();
+    Shader LightShader("src\\light.glsl");
 
     /*Texture2D CeramicTex("src\\ceramic.jpg");
     CeramicTex.Bind();*/
 
     Mesh cube(vertices, sizeof(vertices) / sizeof(vertices[0]), glm::vec3(0, 0, 0), &BasicShader);
+    Mesh light_cube(vertices, sizeof(vertices) / sizeof(vertices[0]), glm::vec3(2.0f, 2.0f, 1.0f), &BasicShader);
 
+    Light light1(glm::vec3(4, 4, 0), glm::vec3(1.0f, 1.0f, 1.0f), &LightShader);
+    light1.SetMesh(&light_cube);
     UpdatePosition(cube);
+    UpdatePosition(light_cube);
+
     float cameraSpeed = 2.5f; // adjust accordingly
     float deltatime = 0.0f;	// Time between current frame and last frame
     float lastFrame = 0.0f; // Time of last frame
 
     
-
+    glEnable(GL_DEPTH_TEST);
     while (!glfwWindowShouldClose(window))
     {
         float currentFrame = glfwGetTime();
@@ -146,7 +154,8 @@ int main(void)
 		// Draw 
         UpdatePosition(cube);
         cube.Render();
-
+        UpdatePosition(light_cube);
+        light_cube.Render();
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
 
