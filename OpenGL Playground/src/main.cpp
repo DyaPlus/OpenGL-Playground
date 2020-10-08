@@ -25,10 +25,15 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 
 void UpdatePosition(Mesh &mesh)
 {  
-    glm::mat4 MVP = Projection * cam.ViewMat() * mesh.ModelMat();
+    //TODO shader should handle the assignment
+    glm::mat4 Model = mesh.ModelMat();
+    glm::mat4 MVP = Projection * cam.ViewMat() * Model;
     GLuint MatrixID = glGetUniformLocation(mesh.m_ShaderToUse->m_ID, "MVP");
+    GLuint ModelID = glGetUniformLocation(mesh.m_ShaderToUse->m_ID, "Model");
+
     mesh.m_ShaderToUse->Bind();
     glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]); //Works on the current bound Shader only
+    glUniformMatrix4fv(ModelID, 1, GL_FALSE, &Model[0][0]); //Works on the current bound Shader only
     mesh.m_ShaderToUse->Unbind();
 }
 
@@ -119,10 +124,11 @@ int main(void)
     CeramicTex.Bind();*/
 
     Mesh cube(vertices, sizeof(vertices) / sizeof(vertices[0]), glm::vec3(0, 0, 0), &BasicShader);
-    Mesh light_cube(vertices, sizeof(vertices) / sizeof(vertices[0]), glm::vec3(2.0f, 2.0f, 1.0f), &BasicShader);
+    Mesh light_cube(vertices, sizeof(vertices) / sizeof(vertices[0]), glm::vec3(2.0f, 0.0f, 0.0f), &BasicShader);
 
-    Light light1(glm::vec3(4, 4, 0), glm::vec3(1.0f, 1.0f, 1.0f), &LightShader);
+    Light light1(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(1.0f, 1.0f, 1.0f), &LightShader);
     light1.SetMesh(&light_cube);
+    light1.AffectShader(BasicShader);
     UpdatePosition(cube);
     UpdatePosition(light_cube);
 

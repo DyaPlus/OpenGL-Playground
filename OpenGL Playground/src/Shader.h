@@ -7,7 +7,6 @@
 #include <sstream>
 #include <vector>
 #include "GLEW/include/GL/glew.h"
-#include "Light.h"
 
 struct ShaderSource {
 	std::string vertex_source;

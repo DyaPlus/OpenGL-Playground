@@ -16,7 +16,7 @@ public:
 	Shader* m_ShaderToUse;
 	Light(glm::vec3 pos, glm::vec3 color , Shader* shader);
 	void SetMesh(Mesh* mesh);
-
+	void AffectShader(const Shader& shader);
 };
 #endif 
 

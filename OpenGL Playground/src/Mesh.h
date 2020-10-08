@@ -16,9 +16,11 @@ private:
 	float* m_Vertices;
 	GLuint m_ID;
 	glm::vec3 m_Pos;
+	glm::vec3 m_Color;
 public:
 	Shader* m_ShaderToUse;
 	Mesh(float* vertices,int length,glm::vec3 pos,Shader* shader);
+	void ChangePosition(glm::vec3 new_pos);
 	glm::mat4 ModelMat();
 	void Render();
 	~Mesh();
