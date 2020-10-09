@@ -10,6 +10,7 @@
 #include "CubeVertices.h"
 #include "Mesh.h"
 #include "Light.h"
+#include "Material.h"
 
 int width = 1024;
 int height = 768;
@@ -51,7 +52,6 @@ void InitGLFW()
     glfwWindowHint(GLFW_SAMPLES, 4); // 4x antialiasing
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); // We want OpenGL 3.3
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy; should not be needed
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // We don't want the old OpenGL 
 }
 
@@ -84,15 +84,17 @@ int main(void)
     Shader BasicShader("src\\basic.glsl");
     Shader LightShader("src\\light.glsl");
 
-    /*Texture2D CeramicTex("src\\ceramic.jpg");
-    CeramicTex.Bind();*/
+    Material RedMat(glm::vec3(1.0), glm::vec3(0.7,0.5,0.2), glm::vec3(0, 0, 0),32.0f);
 
     Mesh cube(vertices, sizeof(vertices) / sizeof(vertices[0]), glm::vec3(0, 0, 0), &BasicShader);
+    cube.SetMat(&RedMat);
+
     Mesh light_cube(vertices, sizeof(vertices) / sizeof(vertices[0]), glm::vec3(2.0f, 0.0f, 0.0f), &BasicShader);
 
-    Light light1(glm::vec3(1.0f, 2.0f, 2.0f), glm::vec3(1.0f, 1.0f, 1.0f), &LightShader);
+    Light light1(glm::vec3(1.0f, 2.0f, 2.0f), glm::vec3(1.0f, 1.0f, 0.0f), &LightShader);
     light1.SetMesh(&light_cube);
     light1.AffectShader(BasicShader);
+
     UpdatePosition(cube);
     UpdatePosition(light_cube);
 
@@ -100,14 +102,14 @@ int main(void)
     float deltatime = 0.0f;	// Time between current frame and last frame
     float lastFrame = 0.0f; // Time of last frame
 
-    
+    float fps;
     glEnable(GL_DEPTH_TEST);
     while (!glfwWindowShouldClose(window))
     {
         float currentFrame = glfwGetTime();
         deltatime = currentFrame - lastFrame;
         lastFrame = currentFrame;
-
+        fps = 1 / deltatime;
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
             cam.Forward(deltatime);
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -133,4 +135,5 @@ int main(void)
         glfwPollEvents();
 		
     }
+    std::cout << fps << std::endl;
 }
