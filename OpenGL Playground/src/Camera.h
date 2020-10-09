@@ -3,7 +3,6 @@
 class Camera 
 {
 private:
-	glm::vec3 m_CamPos;
 	glm::vec3 m_CamFront;
 	glm::vec3 m_CamUp;
 	bool m_FirstMouse;
@@ -14,6 +13,7 @@ private:
 	float m_Sensitivity;
 	float m_Speed;
 public:
+	glm::vec3 m_CamPos;
 	Camera();
 	Camera(glm::vec3 pos, glm::vec3 front, glm::vec3 up,float speed);
 	void Update(float xpos, float ypos);

@@ -27,13 +27,17 @@ void UpdatePosition(Mesh &mesh)
 {  
     //TODO shader should handle the assignment
     glm::mat4 Model = mesh.ModelMat();
-    glm::mat4 MVP = Projection * cam.ViewMat() * Model;
+    glm::mat4 View = cam.ViewMat();
+
+    glm::mat4 MVP = Projection * View * Model;
     GLuint MatrixID = glGetUniformLocation(mesh.m_ShaderToUse->m_ID, "MVP");
     GLuint ModelID = glGetUniformLocation(mesh.m_ShaderToUse->m_ID, "Model");
+    GLuint CamPosID = glGetUniformLocation(mesh.m_ShaderToUse->m_ID, "camPos");
 
     mesh.m_ShaderToUse->Bind();
     glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]); //Works on the current bound Shader only
     glUniformMatrix4fv(ModelID, 1, GL_FALSE, &Model[0][0]); //Works on the current bound Shader only
+    glUniform3fv(CamPosID, 1, &cam.m_CamPos[0]); //Works on the current bound Shader only
     mesh.m_ShaderToUse->Unbind();
 }
 
@@ -77,46 +81,6 @@ int main(void)
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPosCallback(window, mouse_callback);
 
-    /*GLuint VAO;
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);*/
-
-    //float vertices[] = {
-    //    // positions          // colors           // texture coords
-    //     0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
-    //     0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-    //    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-    //    -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
-    //};
-
-    //unsigned int indices[] = {  // note that we start from 0!
-    //    0, 1, 3,   // first triangle
-    //    1, 2, 3    // second triangle
-    //};
-
-    //// This will identify our vertex buffer
-    //GLuint VBO;
-    //// Generate 1 buffer, put the resulting identifier in vertexbuffer
-    //glGenBuffers(1, &VBO);
-    //// The following commands will talk about our 'vertexbuffer' buffer
-    //glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    //// Give our vertices to OpenGL.
-    //glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    //// 1st attribute buffer : vertices
-    //glEnableVertexAttribArray(0);
-    //glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    //// position attribute                           //Stride           //Offset
-    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-    //glEnableVertexAttribArray(0);
-    //// normal attribute
-    //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-    //glEnableVertexAttribArray(1);
-
-   /* unsigned int EBO;
-    glGenBuffers(1, &EBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);*/
-
     Shader BasicShader("src\\basic.glsl");
     Shader LightShader("src\\light.glsl");
 
@@ -126,7 +90,7 @@ int main(void)
     Mesh cube(vertices, sizeof(vertices) / sizeof(vertices[0]), glm::vec3(0, 0, 0), &BasicShader);
     Mesh light_cube(vertices, sizeof(vertices) / sizeof(vertices[0]), glm::vec3(2.0f, 0.0f, 0.0f), &BasicShader);
 
-    Light light1(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(1.0f, 1.0f, 1.0f), &LightShader);
+    Light light1(glm::vec3(1.0f, 2.0f, 2.0f), glm::vec3(1.0f, 1.0f, 1.0f), &LightShader);
     light1.SetMesh(&light_cube);
     light1.AffectShader(BasicShader);
     UpdatePosition(cube);
