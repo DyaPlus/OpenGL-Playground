@@ -34,6 +34,12 @@ Mesh::Mesh(float* vertices,int length, glm::vec3 pos, Shader* shader)
 void Mesh::SetMat(MaterialMap* mat)
 {
     m_Material = mat;
+    GLuint tex1ID = glGetUniformLocation(m_ShaderToUse->m_ID, "material.diffuse");
+    GLuint tex2ID = glGetUniformLocation(m_ShaderToUse->m_ID, "material.specular");
+    m_ShaderToUse->Bind();
+    glUniform1i(tex1ID, 0);
+    glUniform1i(tex2ID, 1);
+    m_ShaderToUse->Unbind();
 }
 
 void Mesh::ChangePosition(glm::vec3 new_pos)
@@ -54,29 +60,33 @@ void Mesh::Render()
     //TODO use one if condition 
     GLuint matAmbID = glGetUniformLocation(m_ShaderToUse->m_ID, "material.ambient");
     GLuint matDiffID = 0;
+    GLuint matSpecID = 0;
+
     if (m_Material->m_IsMapped)
     {
+        glActiveTexture(GL_TEXTURE0);
         m_Material->m_DiffuseMap->Bind();
+        glActiveTexture(GL_TEXTURE1);
+        m_Material->m_SpecularMap->Bind();
+
     }
     else
     {
         GLuint matDiffID = glGetUniformLocation(m_ShaderToUse->m_ID, "material.diffuse");
+        GLuint matSpecID = glGetUniformLocation(m_ShaderToUse->m_ID, "material.specular");
     }
     
-    GLuint matSpecID = glGetUniformLocation(m_ShaderToUse->m_ID, "material.specular");
+    
     GLuint shinID = glGetUniformLocation(m_ShaderToUse->m_ID, "material.shininess");
     glUniform3fv(matAmbID, 1, &(m_Material->m_Ambient)[0]);
     if (!m_Material->m_IsMapped)
     {
         glUniform3fv(matDiffID, 1, &(m_Material->m_Diffuse)[0]);
+        glUniform3fv(matSpecID, 1, &(m_Material->m_Specular)[0]);
     }
-    glUniform3fv(matSpecID, 1, &(m_Material->m_Specular)[0]);
     glUniform1f(shinID, m_Material->m_Shininess);
     glDrawArrays(GL_TRIANGLES, 0, 36);
-    if (m_Material->m_IsMapped)
-    {
-        m_Material->m_DiffuseMap->Unbind();
-    }
+    
     glBindVertexArray(0);
     m_ShaderToUse->Unbind();
 }

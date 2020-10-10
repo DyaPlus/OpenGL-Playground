@@ -83,16 +83,17 @@ int main(void)
 
     Shader BasicShader("res\\basic.glsl");
     Shader LightShader("res\\light.glsl");
-    Texture2D Ceramic("res\\ceramic.jpg");
+    Texture2D Ceramic("res\\Tiles_035_basecolor.jpg");
+    Texture2D CeramicSpec("res\\Tiles_035_roughness.jpg");
 
-    MaterialMap CeramicMat(glm::vec3(1.0), &Ceramic, glm::vec3(1.0, 1.0, 1.0),32.0f);
+    MaterialMap CeramicMat(glm::vec3(1.0), &Ceramic, &CeramicSpec,32.0f);
 
     Mesh cube(vertices, sizeof(vertices) / sizeof(vertices[0]), glm::vec3(0, 0, 0), &BasicShader);
     cube.SetMat(&CeramicMat);
 
     Mesh light_cube(vertices, sizeof(vertices) / sizeof(vertices[0]), glm::vec3(2.0f, 0.0f, 0.0f), &BasicShader);
 
-    Light light1(glm::vec3(1.0f, 2.0f, 2.0f), glm::vec3(1.0f, 1.0f, 0.0f), &LightShader);
+    Light light1(glm::vec3(1.0f, 2.0f, 2.0f), glm::vec3(1.0f, 1.0f, 1.0f), &LightShader);
     light1.SetMesh(&light_cube);
     light1.AffectShader(BasicShader);
 
