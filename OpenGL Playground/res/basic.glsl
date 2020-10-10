@@ -2,8 +2,10 @@
 #version 330 core
 layout (location = 0) in vec4 position;
 layout (location = 1) in vec3 normal;
+layout (location = 2) in vec2 texCoord;
 
 out vec3 ourNormal;
+out vec2 ourTexCoord;
 out vec3 FragPos;
 out vec3 viewVector;
 
@@ -17,17 +19,24 @@ void main()
 
     FragPos = vec3(Model * position); //This value should be interpolated between vertices in the fragment shader
     ourNormal = normal;
-    viewVector = vec3(camPos- FragPos); //A vector in the direction of the visible vertices
+    ourTexCoord = texCoord;
+    viewVector = vec3(camPos - FragPos); //A vector in the direction of the visible vertices
 }
 
 #shader fragment
 #version 330 core
-struct Material {
+/*struct Material {
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
     float shininess;
-}; 
+};*/
+struct Material {
+    vec3 ambient;
+    sampler2D diffuse;
+    vec3 specular;
+    float shininess;
+};
 
 struct Light {
     vec3 pos;
@@ -37,6 +46,7 @@ struct Light {
 out vec4 FragColor;
   
 in vec3 ourNormal;
+in vec2 ourTexCoord; 
 in vec3 FragPos; //After interpolation between vertices of the triangle 
 in vec3 viewVector; //After interpolation between vertices of the triangle 
 
@@ -46,7 +56,7 @@ uniform Material material;
 void main()
 {
     float ambientStrength = 0.08;
-    vec3 ambientCoeff = ambientStrength * material.ambient;
+    vec3 ambientCoeff = ambientStrength * light.color;
     
     vec3 lightVector = normalize(light.pos - FragPos);
     vec3 norm = normalize(ourNormal);
@@ -56,6 +66,6 @@ void main()
     vec3 reflectedVector = -reflect(lightVector,norm);
     //Specular coefficient doesnt use the object color , instead it used custom specular color as the second parameter and the light color as the first parameter
     vec3 specularCoeff = light.color * material.specular * pow(max(dot(reflectedVector,viewVector),0),material.shininess);
-    vec3 result = (diffuseCoeff + ambientCoeff ) * material.diffuse + specularCoeff; //A matte material always reflect the diffuse color (objectColor)
+    vec3 result = (diffuseCoeff + ambientCoeff ) * vec3(texture(material.diffuse,ourTexCoord)) + specularCoeff; //A matte material always reflect the diffuse color (objectColor)
     FragColor = vec4(result, 1.0);
 }

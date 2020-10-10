@@ -18,11 +18,11 @@ private:
 	GLuint m_ID;
 	glm::vec3 m_Pos;
 	glm::vec3 m_Color;
-	Material* m_Material;
+	MaterialMap* m_Material;
 public:
 	Shader* m_ShaderToUse;
 	Mesh(float* vertices,int length,glm::vec3 pos,Shader* shader);
-	void SetMat(Material* mat);
+	void SetMat(MaterialMap* mat);
 	void ChangePosition(glm::vec3 new_pos);
 	glm::mat4 ModelMat();
 	void Render();

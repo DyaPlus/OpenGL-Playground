@@ -6,7 +6,7 @@ Mesh::Mesh(float* vertices,int length, glm::vec3 pos, Shader* shader)
 	m_Pos = pos;
 	m_ShaderToUse = shader;
     m_Color = glm::vec3(1.0, 0.0, 0.0);
-    m_Material = new Material();
+    m_Material = new MaterialMap();
 
 	GLuint VAO;
 	glGenVertexArrays(1, &VAO);
@@ -19,17 +19,19 @@ Mesh::Mesh(float* vertices,int length, glm::vec3 pos, Shader* shader)
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 
     glBindVertexArray(0);
 
     m_ID = VAO;
 }
 
-void Mesh::SetMat(Material* mat)
+void Mesh::SetMat(MaterialMap* mat)
 {
     m_Material = mat;
 }
@@ -49,15 +51,32 @@ void Mesh::Render()
     glBindVertexArray(m_ID);
     m_ShaderToUse->Bind();
     //TODO shader should handle the assignment
+    //TODO use one if condition 
     GLuint matAmbID = glGetUniformLocation(m_ShaderToUse->m_ID, "material.ambient");
-    GLuint matDiffID = glGetUniformLocation(m_ShaderToUse->m_ID, "material.diffuse");
+    GLuint matDiffID = 0;
+    if (m_Material->m_IsMapped)
+    {
+        m_Material->m_DiffuseMap->Bind();
+    }
+    else
+    {
+        GLuint matDiffID = glGetUniformLocation(m_ShaderToUse->m_ID, "material.diffuse");
+    }
+    
     GLuint matSpecID = glGetUniformLocation(m_ShaderToUse->m_ID, "material.specular");
     GLuint shinID = glGetUniformLocation(m_ShaderToUse->m_ID, "material.shininess");
     glUniform3fv(matAmbID, 1, &(m_Material->m_Ambient)[0]);
-    glUniform3fv(matDiffID, 1, &(m_Material->m_Diffuse)[0]);
+    if (!m_Material->m_IsMapped)
+    {
+        glUniform3fv(matDiffID, 1, &(m_Material->m_Diffuse)[0]);
+    }
     glUniform3fv(matSpecID, 1, &(m_Material->m_Specular)[0]);
     glUniform1f(shinID, m_Material->m_Shininess);
     glDrawArrays(GL_TRIANGLES, 0, 36);
+    if (m_Material->m_IsMapped)
+    {
+        m_Material->m_DiffuseMap->Unbind();
+    }
     glBindVertexArray(0);
     m_ShaderToUse->Unbind();
 }

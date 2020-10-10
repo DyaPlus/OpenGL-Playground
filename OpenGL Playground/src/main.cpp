@@ -81,13 +81,14 @@ int main(void)
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPosCallback(window, mouse_callback);
 
-    Shader BasicShader("src\\basic.glsl");
-    Shader LightShader("src\\light.glsl");
+    Shader BasicShader("res\\basic.glsl");
+    Shader LightShader("res\\light.glsl");
+    Texture2D Ceramic("res\\ceramic.jpg");
 
-    Material RedMat(glm::vec3(1.0), glm::vec3(0.7,0.5,0.2), glm::vec3(0, 0, 0),32.0f);
+    MaterialMap CeramicMat(glm::vec3(1.0), &Ceramic, glm::vec3(1.0, 1.0, 1.0),32.0f);
 
     Mesh cube(vertices, sizeof(vertices) / sizeof(vertices[0]), glm::vec3(0, 0, 0), &BasicShader);
-    cube.SetMat(&RedMat);
+    cube.SetMat(&CeramicMat);
 
     Mesh light_cube(vertices, sizeof(vertices) / sizeof(vertices[0]), glm::vec3(2.0f, 0.0f, 0.0f), &BasicShader);
 
