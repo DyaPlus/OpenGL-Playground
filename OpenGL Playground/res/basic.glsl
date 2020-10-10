@@ -18,7 +18,7 @@ void main()
     gl_Position = MVP * position;
 
     FragPos = vec3(Model * position); //This value should be interpolated between vertices in the fragment shader
-    ourNormal = normal;
+    ourNormal = mat3(transpose(inverse(Model))) * normal;
     ourTexCoord = texCoord;
     viewVector = vec3(camPos - FragPos); //A vector in the direction of the visible vertices
 }
@@ -65,6 +65,6 @@ void main()
     vec3 reflectedVector = -reflect(lightVector,norm);
     //Specular coefficient doesnt use the object color , instead it used custom specular color as the second parameter and the light color as the first parameter
     vec3 specularCoeff = light.color * vec3(texture(material.specular,ourTexCoord)) * pow(max(dot(reflectedVector,viewVector),0),material.shininess);
-    vec3 result = (diffuseCoeff + ambientCoeff ) * vec3(texture(material.specular,ourTexCoord)); //A matte material always reflect the diffuse color (objectColor)
+    vec3 result = (diffuseCoeff + ambientCoeff ) * vec3(texture(material.diffuse,ourTexCoord)) + specularCoeff; //A matte material always reflect the diffuse color (objectColor)
     FragColor = vec4(result, 1.0);
 }
