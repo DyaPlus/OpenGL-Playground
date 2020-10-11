@@ -9,7 +9,9 @@
 #include "vendor/glm/gtc/matrix_transform.hpp"
 #include "CubeVertices.h"
 #include "Mesh.h"
-#include "Light.h"
+#include "PointLight.h"
+#include "DirectionalLight.h"
+
 #include "Material.h"
 
 int width = 1024;
@@ -82,6 +84,7 @@ int main(void)
     glfwSetCursorPosCallback(window, mouse_callback);
 
     Shader BasicShader("res\\basic.glsl");
+    Shader BasicDirShader("res\\basic_dir.glsl");
     Shader LightShader("res\\light.glsl");
     Texture2D Ceramic("res\\Tiles_035_basecolor.jpg");
     Texture2D CeramicSpec("res\\Tiles_035_roughness.jpg");
@@ -93,9 +96,12 @@ int main(void)
 
     Mesh light_cube(vertices, sizeof(vertices) / sizeof(vertices[0]), glm::vec3(2.0f, 0.0f, 0.0f), &BasicShader);
 
-    Light light1(glm::vec3(1.0f, 2.0f, 2.0f), glm::vec3(1.0f, 1.0f, 1.0f), &LightShader);
+    PointLight light1(glm::vec3(1.0f, 8.0f, 2.0f), glm::vec3(1.0f, 1.0f, 1.0f), &LightShader);
+    DirectionalLight light2(glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+
     light1.SetMesh(&light_cube);
     light1.AffectShader(BasicShader);
+    light2.AffectShader(BasicDirShader);
 
     UpdatePosition(cube);
     UpdatePosition(light_cube);
@@ -120,6 +126,16 @@ int main(void)
             cam.Left(deltatime);
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
             cam.Right(deltatime);
+        if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+        {
+            light1.UpdatePosition(1.2 * deltatime);
+            light1.AffectShader(BasicShader);
+        }
+        if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+        {
+            light1.UpdatePosition(-1.2 * deltatime);
+            light1.AffectShader(BasicShader);
+        }
         
 
         /* Render here */

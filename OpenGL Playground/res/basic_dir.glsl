@@ -38,12 +38,8 @@ struct Material {
 };
 
 struct Light {
-    vec3 pos;
+    vec3 direction;
     vec3 color;
-
-    float constant;
-    float linear;
-    float quadratic;
 };
 
 out vec4 FragColor;
@@ -58,25 +54,17 @@ uniform Material material;
 
 void main()
 {
-    //Calculate light intensity
-    float lightDistance = length(light.pos - FragPos);
-    float attenuation = 1 /(light.constant + light.linear * lightDistance + light.quadratic * (lightDistance * lightDistance)); 
-    vec3 lightColor = light.color * attenuation;
-
-    //Calculate Ambient Component Using Only Light Color
     float ambientStrength = 0.08;
     vec3 ambientCoeff = ambientStrength * light.color;
     
-    //Calculate Diffuse Comp
-    vec3 lightVector = normalize(light.pos - FragPos);
+    vec3 lightVector = normalize(-light.direction);
     vec3 norm = normalize(ourNormal);
-    vec3 diffuseCoeff = max(dot(lightVector,norm),0) * lightColor;
+    vec3 diffuseCoeff = max(dot(lightVector,norm),0) * light.color;
     
-    //Calculate Specular Comp
     vec3 viewVector = normalize(viewVector);
     vec3 reflectedVector = -reflect(lightVector,norm);
-    vec3 specularCoeff = lightColor * vec3(texture(material.specular,ourTexCoord)) * pow(max(dot(reflectedVector,viewVector),0),material.shininess);
-
-    vec3 result = (diffuseCoeff + ambientCoeff ) * vec3(texture(material.diffuse,ourTexCoord)) + specularCoeff; 
+    //Specular coefficient doesnt use the object color , instead it used custom specular color as the second parameter and the light color as the first parameter
+    vec3 specularCoeff = light.color * vec3(texture(material.specular,ourTexCoord)) * pow(max(dot(reflectedVector,viewVector),0),material.shininess);
+    vec3 result = (diffuseCoeff + ambientCoeff ) * vec3(texture(material.diffuse,ourTexCoord)) + specularCoeff; //A matte material always reflect the diffuse color (objectColor)
     FragColor = vec4(result, 1.0);
 }
