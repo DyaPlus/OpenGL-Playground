@@ -9,8 +9,7 @@
 #include "vendor/glm/gtc/matrix_transform.hpp"
 #include "CubeVertices.h"
 #include "Mesh.h"
-#include "PointLight.h"
-#include "DirectionalLight.h"
+#include "light/LightManager.h"
 
 #include "Material.h"
 
@@ -96,12 +95,11 @@ int main(void)
 
     Mesh light_cube(vertices, sizeof(vertices) / sizeof(vertices[0]), glm::vec3(2.0f, 0.0f, 0.0f), &BasicShader);
 
-    PointLight light1(glm::vec3(1.0f, 8.0f, 2.0f), glm::vec3(1.0f, 1.0f, 1.0f), &LightShader);
-    DirectionalLight light2(glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    PointLight * light1 = LightManager::Get()->CreatePointLight(glm::vec3(1.0f, 8.0f, 2.0f), glm::vec3(1.0f, 1.0f, 1.0f), &LightShader);
+    DirectionalLight* light2 = LightManager::Get()->CreateDirectionalLight(glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 
-    light1.SetMesh(&light_cube);
-    light1.AffectShader(BasicShader);
-    light2.AffectShader(BasicDirShader);
+    light1->SetMesh(&light_cube);
+    LightManager::Get()->AffectShader(BasicShader);
 
     UpdatePosition(cube);
     UpdatePosition(light_cube);
@@ -128,13 +126,13 @@ int main(void)
             cam.Right(deltatime);
         if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
         {
-            light1.UpdatePosition(1.2 * deltatime);
-            light1.AffectShader(BasicShader);
+            light1->UpdatePosition(1.2 * deltatime);
+            light1->AffectShader(BasicShader);
         }
         if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
         {
-            light1.UpdatePosition(-1.2 * deltatime);
-            light1.AffectShader(BasicShader);
+            light1->UpdatePosition(-1.2 * deltatime);
+            light1->AffectShader(BasicShader);
         }
         
 

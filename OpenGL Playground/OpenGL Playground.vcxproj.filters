@@ -36,10 +36,13 @@
     <ClCompile Include="src\Material.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\DirectionalLight.cpp">
+    <ClCompile Include="src\light\DirectionalLight.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\PointLight.cpp">
+    <ClCompile Include="src\light\PointLight.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\light\LightManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -68,10 +71,13 @@
     <ClInclude Include="src\Material.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\DirectionalLight.h">
+    <ClInclude Include="src\light\PointLight.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\PointLight.h">
+    <ClInclude Include="src\light\DirectionalLight.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\light\LightManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -2,13 +2,14 @@
 #define POINTLIGHT_H
 
 
-#include "vendor/glm/gtc/matrix_transform.hpp"
-#include "Mesh.h"
-#include "Shader.h"
+#include "src/vendor/glm/gtc/matrix_transform.hpp"
+#include "src/Mesh.h"
+#include "src/Shader.h"
 
 class PointLight
 {
-private:
+	//TODO : memebrs can't be public
+public:
 	glm::vec3 m_Pos;
 	glm::vec3 m_Color;
 	Mesh* m_Mesh;

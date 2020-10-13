@@ -29,11 +29,11 @@ void PointLight::SetFalloffParam(float constant, float linear, float quad)
 void PointLight::AffectShader(const Shader& shader)
 {
 	//TODO shader should handle the assignment
-	GLuint lightPosID = glGetUniformLocation(shader.m_ID, "light.pos");
-	GLuint lightColorID = glGetUniformLocation(shader.m_ID, "light.color");
-	GLuint lightFalloffConstID = glGetUniformLocation(shader.m_ID, "light.constant");
-	GLuint lightFalloffLinearID = glGetUniformLocation(shader.m_ID, "light.linear");
-	GLuint lightFalloffQuadID = glGetUniformLocation(shader.m_ID, "light.quadratic");
+	GLuint lightPosID = glGetUniformLocation(shader.m_ID, "light[0].pos");
+	GLuint lightColorID = glGetUniformLocation(shader.m_ID, "light[0].color");
+	GLuint lightFalloffConstID = glGetUniformLocation(shader.m_ID, "light[0].constant");
+	GLuint lightFalloffLinearID = glGetUniformLocation(shader.m_ID, "light[0].linear");
+	GLuint lightFalloffQuadID = glGetUniformLocation(shader.m_ID, "light[0].quadratic");
 
 	shader.Bind();
 	glUniform3fv(lightPosID, 1, &m_Pos[0]);

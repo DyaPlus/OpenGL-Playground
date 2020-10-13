@@ -46,6 +46,8 @@ struct Light {
     float quadratic;
 };
 
+#define NR_POINT_LIGHTS 4  
+
 out vec4 FragColor;
   
 in vec3 ourNormal;
@@ -53,30 +55,34 @@ in vec2 ourTexCoord;
 in vec3 FragPos; //After interpolation between vertices of the triangle 
 in vec3 viewVector; //After interpolation between vertices of the triangle 
 
-uniform Light light;
+uniform Light light[NR_POINT_LIGHTS];
 uniform Material material;
-
+uniform int numberOfActiveLights;
 void main()
 {
-    //Calculate light intensity
-    float lightDistance = length(light.pos - FragPos);
-    float attenuation = 1 /(light.constant + light.linear * lightDistance + light.quadratic * (lightDistance * lightDistance)); 
-    vec3 lightColor = light.color * attenuation;
+    vec3 result = vec3(0,0,0);
+    for(int i = 0; i < numberOfActiveLights; ++i) //TODO : numbers of active lights should be set by application
+    {
+        //Calculate light intensity
+        float lightDistance = length(light[i].pos - FragPos);
+        float attenuation = 1 /(light[i].constant + light[i].linear * lightDistance + light[i].quadratic * (lightDistance * lightDistance)); 
+        vec3 lightColor = light[i].color * attenuation;
 
-    //Calculate Ambient Component Using Only Light Color
-    float ambientStrength = 0.08;
-    vec3 ambientCoeff = ambientStrength * light.color;
+        //Calculate Ambient Component Using Only Light Color
+        float ambientStrength = 0.08;
+        vec3 ambientCoeff = ambientStrength * light[i].color; //Not affected by attenuation
     
-    //Calculate Diffuse Comp
-    vec3 lightVector = normalize(light.pos - FragPos);
-    vec3 norm = normalize(ourNormal);
-    vec3 diffuseCoeff = max(dot(lightVector,norm),0) * lightColor;
+        //Calculate Diffuse Comp
+        vec3 lightVector = normalize(light[i].pos - FragPos);
+        vec3 norm = normalize(ourNormal);
+        vec3 diffuseCoeff = max(dot(lightVector,norm),0) * lightColor;
     
-    //Calculate Specular Comp
-    vec3 viewVector = normalize(viewVector);
-    vec3 reflectedVector = -reflect(lightVector,norm);
-    vec3 specularCoeff = lightColor * vec3(texture(material.specular,ourTexCoord)) * pow(max(dot(reflectedVector,viewVector),0),material.shininess);
+        //Calculate Specular Comp
+        vec3 viewVector = normalize(viewVector);
+        vec3 reflectedVector = -reflect(lightVector,norm);
+        vec3 specularCoeff = lightColor * vec3(texture(material.specular,ourTexCoord)) * pow(max(dot(reflectedVector,viewVector),0),material.shininess);
 
-    vec3 result = (diffuseCoeff + ambientCoeff ) * vec3(texture(material.diffuse,ourTexCoord)) + specularCoeff; 
+        result += (diffuseCoeff + ambientCoeff ) * vec3(texture(material.diffuse,ourTexCoord)) + specularCoeff; 
+    }
     FragColor = vec4(result, 1.0);
 }

@@ -2,8 +2,8 @@
 #define DIRECTIONALLIGHT_H
 
 
-#include "vendor/glm/gtc/matrix_transform.hpp"
-#include "Shader.h"
+#include "src/vendor/glm/gtc/matrix_transform.hpp"
+#include "src/Shader.h"
 
 class DirectionalLight
 {
