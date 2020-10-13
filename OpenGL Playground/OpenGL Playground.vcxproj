@@ -142,7 +142,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>shell32.lib;user32.lib;gdi32.lib;glfw3.lib;glew32s.lib;opengl32.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>E:\VS_Projects\OpenGL Playground\OpenGL Playground\Dependencies\GLEW\lib\Release\x64;E:\VS_Projects\OpenGL Playground\OpenGL Playground\Dependencies\GLFW\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)Dependencies\GLEW\lib\Release\x64;$(ProjectDir)Dependencies\GLFW\lib;$(ProjectDir)Dependencies\Assimp\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

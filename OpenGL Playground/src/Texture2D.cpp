@@ -1,11 +1,12 @@
 #include "Texture2D.h"
 #include "ImageLoader.h"
 
-Texture2D::Texture2D(const char* filepath)
+Texture2D::Texture2D(const char* filepath , TextureType type)
 {
     unsigned int texture;
     glGenTextures(1, &texture);
     m_ID = texture;
+    m_Type = type;
     // set the texture wrapping/filtering options (on the currently bound texture object)
     //TODO Change by additional methods
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
