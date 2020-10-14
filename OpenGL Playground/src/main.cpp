@@ -27,20 +27,18 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 
 void UpdatePosition(Mesh &mesh)
 {  
-    //TODO shader should handle the assignment
+    
     glm::mat4 Model = mesh.ModelMat();
     glm::mat4 View = cam.ViewMat();
-
     glm::mat4 MVP = Projection * View * Model;
-    GLuint MatrixID = glGetUniformLocation(mesh.m_ShaderToUse->m_ID, "MVP");
-    GLuint ModelID = glGetUniformLocation(mesh.m_ShaderToUse->m_ID, "Model");
-    GLuint CamPosID = glGetUniformLocation(mesh.m_ShaderToUse->m_ID, "camPos");
 
-    mesh.m_ShaderToUse->Bind();
-    glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]); //Works on the current bound Shader only
-    glUniformMatrix4fv(ModelID, 1, GL_FALSE, &Model[0][0]); //Works on the current bound Shader only
-    glUniform3fv(CamPosID, 1, &cam.m_CamPos[0]); //Works on the current bound Shader only
-    mesh.m_ShaderToUse->Unbind();
+    mesh.m_ShaderToUse->SetMatrix4("MVP", MVP);
+    if (mesh.m_ShaderToUse->GetType() == ShaderType::Basic)
+    {       
+        mesh.m_ShaderToUse->SetMatrix4("Model", Model);
+        mesh.m_ShaderToUse->SetVector3("camPos", cam.m_CamPos);
+    }
+
 }
 
 void InitGLFW()
@@ -82,11 +80,11 @@ int main(void)
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPosCallback(window, mouse_callback);
 
-    Shader BasicShader("res\\basic.glsl");
-    Shader BasicDirShader("res\\basic_dir.glsl");
-    Shader LightShader("res\\light.glsl");
-    Texture2D Ceramic("res\\Tiles_035_basecolor.jpg");
-    Texture2D CeramicSpec("res\\Tiles_035_roughness.jpg");
+    Shader BasicShader("res\\basic.glsl",ShaderType::Basic);
+    Shader BasicDirShader("res\\basic_dir.glsl", ShaderType::Basic);
+    Shader LightShader("res\\light.glsl", ShaderType::Light);
+    Texture2D Ceramic("res\\Tiles_035_basecolor.jpg",TextureType::DIFFUSE);
+    Texture2D CeramicSpec("res\\Tiles_035_roughness.jpg", TextureType::SPECULAR);
 
     MaterialMap CeramicMat(glm::vec3(1.0), &Ceramic, &CeramicSpec,32.0f);
 

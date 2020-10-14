@@ -6,6 +6,7 @@ DirectionalLight::DirectionalLight(glm::vec3 direction, glm::vec3 color)
 	
 }
 
+//TODO remove as the light manager is setting the values
 void DirectionalLight::AffectShader(const Shader& shader)
 {
 	//TODO shader should handle the assignment

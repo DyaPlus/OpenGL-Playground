@@ -12,11 +12,7 @@ void PointLight::SetMesh(Mesh* mesh)
 	m_Mesh = mesh;
 	m_Mesh->ChangePosition(m_Pos);
 	m_Mesh->m_ShaderToUse = m_ShaderToUse;
-	GLuint lightColorID = glGetUniformLocation(m_ShaderToUse->m_ID, "color");
-	m_ShaderToUse->Bind();
-	glUniform3fv(lightColorID, 1, &m_Color[0]);
-	m_ShaderToUse->Unbind();
-
+	m_ShaderToUse->SetVector3("color", m_Color);
 }
 
 void PointLight::SetFalloffParam(float constant, float linear, float quad)
@@ -26,6 +22,7 @@ void PointLight::SetFalloffParam(float constant, float linear, float quad)
 	m_Quadratic = quad;
 }
 
+//TODO REMOVE AS LightManager is setting the values 
 void PointLight::AffectShader(const Shader& shader)
 {
 	//TODO shader should handle the assignment

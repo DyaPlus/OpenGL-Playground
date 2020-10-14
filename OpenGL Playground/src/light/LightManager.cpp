@@ -29,28 +29,21 @@ DirectionalLight* LightManager::CreateDirectionalLight(glm::vec3 direction, glm:
 	return light;
 }
 
-void LightManager::AffectShader(const Shader& shader)
+void LightManager::AffectShader(Shader& shader)
 {
-	shader.Bind();
 	//TODO add directional light support
+	//TODO Set the values as an array
+
 	for (int i = 0; i < m_PointLights.size(); ++i)
 	{
 		std::string light_element = "light[" + std::to_string(i) + "].";
-		//TODO shader should handle the assignment
-		GLuint lightPosID = glGetUniformLocation(shader.m_ID, (light_element + "pos").c_str());
-		GLuint lightColorID = glGetUniformLocation(shader.m_ID, (light_element + "color").c_str());
-		GLuint lightFalloffConstID = glGetUniformLocation(shader.m_ID, (light_element + "constant").c_str());
-		GLuint lightFalloffLinearID = glGetUniformLocation(shader.m_ID, (light_element + "linear").c_str());
-		GLuint lightFalloffQuadID = glGetUniformLocation(shader.m_ID, (light_element + "quadratic").c_str());
-
-		glUniform3fv(lightPosID, 1, &(m_PointLights[i]->m_Pos[0]));
-		glUniform3fv(lightColorID, 1, &(m_PointLights[i]->m_Color[0]));
-		glUniform1f(lightFalloffConstID, m_PointLights[i]->m_Constant);
-		glUniform1f(lightFalloffLinearID, m_PointLights[i]->m_Linear);
-		glUniform1f(lightFalloffQuadID, m_PointLights[i]->m_Quadratic);
+		shader.SetVector3(light_element + "pos", m_PointLights[i]->m_Pos);
+		shader.SetVector3(light_element + "color", m_PointLights[i]->m_Color);
+		shader.SetFloat(light_element + "constant", m_PointLights[i]->m_Constant);
+		shader.SetFloat(light_element + "linear", m_PointLights[i]->m_Linear);
+		shader.SetFloat(light_element + "quadratic", m_PointLights[i]->m_Quadratic);
 	}
 
-	GLuint numOfLightsID = glGetUniformLocation(shader.m_ID, "numberOfActiveLights");
-	glUniform1i(numOfLightsID, m_PointLights.size());
-	shader.Unbind();
+	shader.SetInteger("numberOfActiveLights", m_PointLights.size());
+	
 }
