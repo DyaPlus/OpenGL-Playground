@@ -6,7 +6,7 @@
 #include "vendor/glm/gtc/matrix_transform.hpp"
 #include "Shader.h"
 #include "Material.h"
-
+#include "Vertex.h"
 /*A simple mesh class
 It uses one vertex array to bind the buffer data and associate a vertex array object for each mesh
 Thats a perofrmance issue*/
@@ -14,16 +14,19 @@ Thats a perofrmance issue*/
 class Mesh
 {
 private:
-	float* m_Vertices;
 	GLuint m_ID;
 	glm::vec3 m_Pos;
-	glm::vec3 m_Color;
+	std::vector<Vertex> m_Vertices;
+	std::vector<unsigned int> m_Indices;
 	MaterialMap* m_Material;
 public:
+	//TODO REMOVE SHADER FROM MESH
 	Shader* m_ShaderToUse;
-	Mesh(float* vertices,int length,glm::vec3 pos,Shader* shader);
+	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, MaterialMap* material);
 	void SetMat(MaterialMap* mat);
-	void ChangePosition(glm::vec3 new_pos);
+	void SetShader(Shader* shader); //TODO Mesh can't use a shader
+
+	void SetPosition(glm::vec3 new_pos);
 	glm::mat4 ModelMat();
 	void Render();
 	~Mesh();

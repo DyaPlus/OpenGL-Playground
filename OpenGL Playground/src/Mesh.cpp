@@ -1,12 +1,12 @@
 #include "Mesh.h"
 
-Mesh::Mesh(float* vertices,int length, glm::vec3 pos, Shader* shader)
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, MaterialMap* material)
 {
     m_Vertices = vertices;
-	m_Pos = pos;
-	m_ShaderToUse = shader;
-    m_Color = glm::vec3(1.0, 0.0, 0.0);
-    m_Material = new MaterialMap();
+    m_Indices = indices;
+
+	m_Pos = glm::vec3(0.0f);
+	m_Material = material;
 
 	GLuint VAO;
 	glGenVertexArrays(1, &VAO);
@@ -15,15 +15,18 @@ Mesh::Mesh(float* vertices,int length, glm::vec3 pos, Shader* shader)
     GLuint VBO;
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*length, m_Vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, m_Vertices.size() * sizeof(Vertex) , &m_Vertices[0], GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    GLuint EBO;
+    glGenBuffers(1, &EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_Indices.size() * sizeof(unsigned int), &m_Indices[0], GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex,m_Normal));
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, m_TexCoords));
     glEnableVertexAttribArray(2);
 
     glBindVertexArray(0);
@@ -38,7 +41,12 @@ void Mesh::SetMat(MaterialMap* mat)
     m_ShaderToUse->SetInteger("material.specular", 1);
 }
 
-void Mesh::ChangePosition(glm::vec3 new_pos)
+void Mesh::SetShader(Shader* shader)
+{
+    m_ShaderToUse = shader;
+}
+
+void Mesh::SetPosition(glm::vec3 new_pos)
 {
     m_Pos = new_pos;
 }
@@ -72,8 +80,8 @@ void Mesh::Render()
     }
     
     m_ShaderToUse->Bind();
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-    
+    //glDrawArrays(GL_TRIANGLES, 0, 36);
+    glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
     m_ShaderToUse->Unbind();
 }

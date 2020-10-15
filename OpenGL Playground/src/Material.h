@@ -23,7 +23,6 @@ struct Material
 
 struct MaterialMap
 {
-    glm::vec3 m_Ambient;
     Texture2D* m_DiffuseMap;
     glm::vec3 m_Diffuse;
     Texture2D* m_SpecularMap;
@@ -32,13 +31,13 @@ struct MaterialMap
 
     bool m_IsMapped;
 
-    MaterialMap(glm::vec3 ambient, Texture2D* diffuse, Texture2D* specular, float shininess)
-        :m_Ambient(ambient), m_DiffuseMap(diffuse), m_SpecularMap(specular), m_Shininess(shininess)
+    MaterialMap(Texture2D* diffuse, Texture2D* specular, float shininess)
+        :m_DiffuseMap(diffuse), m_SpecularMap(specular), m_Shininess(shininess)
     {
         m_IsMapped = true;
     }
     MaterialMap() //basic white color
-        :m_Ambient(glm::vec3(0)), m_Diffuse(glm::vec3(1.0)), m_Specular(glm::vec3(0)), m_Shininess(0)
+        :m_Diffuse(glm::vec3(1.0)), m_Specular(glm::vec3(0)), m_Shininess(0)
     {
         m_IsMapped = false;
 

@@ -5,10 +5,13 @@
 #include "GLEW/include/GL/glew.h"
 #include "GLFW/include/GLFW/glfw3.h"
 #include <iostream>
+#include <filesystem>
 #include <string>
 #include "vendor/glm/gtc/matrix_transform.hpp"
 #include "CubeVertices.h"
 #include "Mesh.h"
+#include "Model.h"
+
 #include "light/LightManager.h"
 
 #include "Material.h"
@@ -25,18 +28,20 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     cam.Update(xpos, ypos);
 }
 
-void UpdatePosition(Mesh &mesh)
+void UpdatePosition(Model &model)
 {  
-    
-    glm::mat4 Model = mesh.ModelMat();
-    glm::mat4 View = cam.ViewMat();
-    glm::mat4 MVP = Projection * View * Model;
+    for (int i = 0; i < model.GetNumMeshes(); ++i)
+    {
+        glm::mat4 Model = model.GetMesh(i).ModelMat();
+        glm::mat4 View = cam.ViewMat();
+        glm::mat4 MVP = Projection * View * Model;
 
-    mesh.m_ShaderToUse->SetMatrix4("MVP", MVP);
-    if (mesh.m_ShaderToUse->GetType() == ShaderType::Basic)
-    {       
-        mesh.m_ShaderToUse->SetMatrix4("Model", Model);
-        mesh.m_ShaderToUse->SetVector3("camPos", cam.m_CamPos);
+        model.GetMesh(i).m_ShaderToUse->SetMatrix4("MVP", MVP);
+        if (model.GetMesh(i).m_ShaderToUse->GetType() == ShaderType::Basic)
+        {       
+            model.GetMesh(i).m_ShaderToUse->SetMatrix4("Model", Model);
+            model.GetMesh(i).m_ShaderToUse->SetVector3("camPos", cam.m_CamPos);
+        }
     }
 
 }
@@ -86,21 +91,18 @@ int main(void)
     Texture2D Ceramic("res\\Tiles_035_basecolor.jpg",TextureType::DIFFUSE);
     Texture2D CeramicSpec("res\\Tiles_035_roughness.jpg", TextureType::SPECULAR);
 
-    MaterialMap CeramicMat(glm::vec3(1.0), &Ceramic, &CeramicSpec,32.0f);
+    MaterialMap CeramicMat( &Ceramic, &CeramicSpec,32.0f);
 
-    Mesh cube(vertices, sizeof(vertices) / sizeof(vertices[0]), glm::vec3(0, 0, 0), &BasicShader);
-    cube.SetMat(&CeramicMat);
 
-    Mesh light_cube(vertices, sizeof(vertices) / sizeof(vertices[0]), glm::vec3(2.0f, 0.0f, 0.0f), &BasicShader);
+    //Mesh light_cube(vertices, sizeof(vertices) / sizeof(vertices[0]), glm::vec3(2.0f, 0.0f, 0.0f), &BasicShader);
 
     PointLight * light1 = LightManager::Get()->CreatePointLight(glm::vec3(1.0f, 8.0f, 2.0f), glm::vec3(1.0f, 1.0f, 1.0f), &LightShader);
     DirectionalLight* light2 = LightManager::Get()->CreateDirectionalLight(glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 
-    light1->SetMesh(&light_cube);
     LightManager::Get()->AffectShader(BasicShader);
 
-    UpdatePosition(cube);
-    UpdatePosition(light_cube);
+    Model testmodel("res/guitar/backpack.obj");
+    testmodel.SetShader(&BasicShader);
 
     float cameraSpeed = 2.5f; // adjust accordingly
     float deltatime = 0.0f;	// Time between current frame and last frame
@@ -138,10 +140,10 @@ int main(void)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
  
 		// Draw 
-        UpdatePosition(cube);
-        cube.Render();
-        UpdatePosition(light_cube);
-        light_cube.Render();
+        UpdatePosition(testmodel);
+
+        testmodel.Render();
+
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
 

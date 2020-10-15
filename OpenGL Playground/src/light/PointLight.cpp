@@ -7,10 +7,11 @@ PointLight::PointLight(glm::vec3 pos, glm::vec3 color, Shader* shader)
 }
 
 //TODO the mesh can't be modified by the light object
+//TODO make a seperate light model class
 void PointLight::SetMesh(Mesh* mesh)
 {
 	m_Mesh = mesh;
-	m_Mesh->ChangePosition(m_Pos);
+	m_Mesh->SetPosition(m_Pos);
 	m_Mesh->m_ShaderToUse = m_ShaderToUse;
 	m_ShaderToUse->SetVector3("color", m_Color);
 }
@@ -44,5 +45,5 @@ void PointLight::AffectShader(const Shader& shader)
 void PointLight::UpdatePosition(float val)
 {
 	m_Pos += glm::vec3(0,val,0);
-	m_Mesh->ChangePosition(m_Pos);
+	//m_Mesh->SetPosition(m_Pos);
 }
