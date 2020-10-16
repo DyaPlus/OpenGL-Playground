@@ -66,15 +66,26 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
 
     // process material
     //TODO : simplify or improve
+    //TODO : handle default material if failed to load the required textures and remove the hack
     MaterialMap* mat;
     if (mesh->mMaterialIndex >= 0)
     {
         aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
         std::vector<Texture2D*> diffuseMaps = loadMaterialTextures(material,
             aiTextureType_DIFFUSE, TextureType::DIFFUSE);
+        if (diffuseMaps.size() == 0)
+        {
+            Texture2D Ceramic("res\\Tiles_035_basecolor.jpg", TextureType::DIFFUSE);
+            diffuseMaps.push_back(new Texture2D(Ceramic));
+        }
         //textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
         std::vector<Texture2D*> specularMaps = loadMaterialTextures(material,
             aiTextureType_SPECULAR, TextureType::SPECULAR);
+        if (specularMaps.size() == 0)
+        {
+            Texture2D CeramicSpec("res\\Tiles_035_roughness.jpg", TextureType::SPECULAR);
+            specularMaps.push_back(new Texture2D(CeramicSpec));
+        }
         //textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
         mat = new MaterialMap(diffuseMaps[0], specularMaps[0], 32.0f); //TODO shininess should be choosable
     }
