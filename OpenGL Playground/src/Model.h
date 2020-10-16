@@ -18,6 +18,7 @@ private:
     // model data
     std::vector<Mesh> m_Meshes;
     std::string m_Directory;
+    std::vector<Texture2D*> m_TexturesLoaded;
 
     void loadModel(std::string path);
     void processNode(aiNode* node, const aiScene* scene);
@@ -29,5 +30,5 @@ public:
     unsigned int GetNumMeshes() const;
     void SetShader(Shader* shader);
     Mesh GetMesh(unsigned int number) const;
-
+    ~Model();
 };

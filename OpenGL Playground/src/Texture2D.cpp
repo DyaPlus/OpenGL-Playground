@@ -7,6 +7,8 @@ Texture2D::Texture2D(const char* filepath , TextureType type)
     glGenTextures(1, &texture);
     m_ID = texture;
     m_Type = type;
+    m_Path = std::string(filepath);
+
     // set the texture wrapping/filtering options (on the currently bound texture object)
     //TODO Change by additional methods
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -27,6 +29,11 @@ Texture2D::Texture2D(const char* filepath , TextureType type)
     }
     free_image(tex);
     glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+std::string Texture2D::GetPath() const
+{
+    return m_Path;
 }
 
 void Texture2D::Bind()

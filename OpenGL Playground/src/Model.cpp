@@ -98,10 +98,25 @@ std::vector<Texture2D*> Model::loadMaterialTextures(aiMaterial* mat, aiTextureTy
         aiString str;
         mat->GetTexture(type, i, &str);
         std::string path_to_tex = m_Directory + "/" + std::string(str.C_Str());
+        bool exist = false;
+        for (int j = 0; j < m_TexturesLoaded.size(); ++j)
+        {
+            if (!std::strcmp(m_TexturesLoaded[j]->GetPath().c_str(), path_to_tex.c_str()))
+            {
+                std::cout << "found it" << std::endl;
+                textures.push_back(m_TexturesLoaded[j]);
+                exist = true;
+                break;
+            }
+        }
+        if (!exist)
+        {
         std::cout << "Loading : " << path_to_tex << std::endl;
-
         Texture2D *texture = new Texture2D(path_to_tex.c_str(), TexType);
         textures.push_back(texture);
+        m_TexturesLoaded.push_back(texture);
+        }
+
     }
     return textures;
 }
@@ -135,4 +150,12 @@ void Model::SetShader(Shader* shader)
 Mesh Model::GetMesh(unsigned int number) const
 {
     return m_Meshes[number];
+}
+
+Model::~Model()
+{
+    for (int i = 0; i < m_TexturesLoaded.size(); ++i)
+    {
+    delete m_TexturesLoaded[i];
+    }
 }
