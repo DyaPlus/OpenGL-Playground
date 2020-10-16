@@ -145,6 +145,14 @@ void Model::Render()
     }
 }
 
+void Model::SetPosition(glm::vec3 trans)
+{
+    for (auto& mesh : m_Meshes)
+    {
+        mesh.SetPosition(trans);
+    }
+}
+
 unsigned int Model::GetNumMeshes() const
 {
     return m_Meshes.size();

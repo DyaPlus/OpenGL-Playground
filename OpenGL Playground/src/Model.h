@@ -26,7 +26,11 @@ private:
     std::vector<Texture2D*> loadMaterialTextures(aiMaterial* mat, aiTextureType type,TextureType TexType);
 public:
     Model(std::string path);
+    //Public Methods
     void Render();
+    void SetPosition(glm::vec3 trans);
+
+    //Utilities
     unsigned int GetNumMeshes() const;
     void SetShader(Shader* shader);
     Mesh GetMesh(unsigned int number) const;

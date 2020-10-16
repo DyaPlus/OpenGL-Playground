@@ -6,6 +6,8 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, Mate
     m_Indices = indices;
 
 	m_Pos = glm::vec3(0.0f);
+    m_Scale = glm::vec3(1.0f);
+    m_Rotation = glm::vec3(0.0f);
 	m_Material = material;
 
 	GLuint VAO;
@@ -51,9 +53,25 @@ void Mesh::SetPosition(glm::vec3 new_pos)
     m_Pos = new_pos;
 }
 
+void Mesh::SetScale(glm::vec3 new_scale)
+{
+    m_Scale = new_scale;
+}
+
+void Mesh::SetRotation(glm::vec3 new_rot)
+{
+    m_Rotation = new_rot;
+}
+
 glm::mat4 Mesh::ModelMat()
 {
-    return glm::translate(glm::mat4(1.0f),m_Pos);
+    glm::mat4 trans_mat = glm::translate(glm::mat4(1.0f), m_Pos);
+    glm::mat4 rotation_mat = glm::rotate(trans_mat, m_Rotation.x ,glm::vec3(1,0,0));
+    rotation_mat = glm::rotate(rotation_mat, m_Rotation.y, glm::vec3(0, 1, 0));
+    rotation_mat = glm::rotate(rotation_mat, m_Rotation.z, glm::vec3(0, 0, 1));
+    glm::mat4 scale_mat = glm::scale(rotation_mat, m_Scale);
+
+    return scale_mat;
 }
 
 void Mesh::Render()
