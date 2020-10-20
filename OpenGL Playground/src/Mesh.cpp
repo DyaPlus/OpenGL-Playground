@@ -83,9 +83,9 @@ void Mesh::Render()
         //TODO : Texture stuff clean them with no opengl calls
         if (m_Material->m_IsMapped)
         {
-            glActiveTexture(GL_TEXTURE0);
+            glActiveTexture(GL_TEXTURE0); //Activate 0 for diffuse
             m_Material->m_DiffuseMap->Bind();
-            glActiveTexture(GL_TEXTURE1);
+            glActiveTexture(GL_TEXTURE1); //Activate 1 for diffuse
             m_Material->m_SpecularMap->Bind();
         }
         else
@@ -102,6 +102,7 @@ void Mesh::Render()
     glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
     m_ShaderToUse->Unbind();
+    glActiveTexture(GL_TEXTURE0); //Reset default texture unit
 }
 
 Mesh::~Mesh()

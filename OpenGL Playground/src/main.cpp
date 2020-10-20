@@ -8,9 +8,10 @@
 #include <filesystem>
 #include <string>
 #include "vendor/glm/gtc/matrix_transform.hpp"
-#include "CubeVertices.h"
 #include "Mesh.h"
 #include "Model.h"
+#include "CubeMap.h"
+#include "Skybox.h"
 
 #include "light/LightManager.h"
 
@@ -43,6 +44,15 @@ void UpdatePosition(Model &model)
             model.GetMesh(i).m_ShaderToUse->SetVector3("camPos", cam.m_CamPos);
         }
     }
+
+}
+void UpdatePosition(Skybox& skybox)
+{
+    
+    glm::mat4 View = glm::mat4(glm::mat3(cam.ViewMat()));
+    glm::mat4 MVP = Projection * View;
+
+    skybox.m_ShaderToUse->SetMatrix4("MVP", MVP);
 
 }
 
@@ -85,24 +95,44 @@ int main(void)
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPosCallback(window, mouse_callback);
 
+    //Create Shaders
     Shader BasicShader("res\\basic.glsl",ShaderType::Basic);
     Shader BasicDirShader("res\\basic_dir.glsl", ShaderType::Basic);
     Shader LightShader("res\\light.glsl", ShaderType::Light);
+    Shader SkyboxShader("res\\skybox_shader.glsl", ShaderType::Basic);
+
+    //Create Texture
     Texture2D Ceramic("res\\Tiles_035_basecolor.jpg",TextureType::DIFFUSE);
     Texture2D CeramicSpec("res\\Tiles_035_roughness.jpg", TextureType::SPECULAR);
 
+    //Create Materials
     MaterialMap CeramicMat( &Ceramic, &CeramicSpec,32.0f);
 
-
-    //Mesh light_cube(vertices, sizeof(vertices) / sizeof(vertices[0]), glm::vec3(2.0f, 0.0f, 0.0f), &BasicShader);
-
+    //Setup Lights
     PointLight * light1 = LightManager::Get()->CreatePointLight(glm::vec3(1.0f, 8.0f, 2.0f), glm::vec3(1.0f, 1.0f, 1.0f), &LightShader);
+
     DirectionalLight* light2 = LightManager::Get()->CreateDirectionalLight(glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 
     LightManager::Get()->AffectShader(BasicShader);
 
+    //Create Model
     Model testmodel("res/guitar/backpack.obj");
     testmodel.SetShader(&BasicShader);
+
+    //Create Cubemap
+    std::vector<std::string> faces = 
+    {
+        "right.jpg",
+        "left.jpg",
+        "top.jpg",
+        "bottom.jpg",
+        "front.jpg",
+        "back.jpg"
+    };
+    CubeMap cube_map("res/Skybox/skybox/",faces);
+
+    //Create Skybox
+    Skybox skybox(&cube_map, &SkyboxShader);
 
     float cameraSpeed = 2.5f; // adjust accordingly
     float deltatime = 0.0f;	// Time between current frame and last frame
@@ -140,8 +170,10 @@ int main(void)
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
  
 		// Draw 
-        UpdatePosition(testmodel);
+        UpdatePosition(skybox);
+        skybox.Render();
 
+        UpdatePosition(testmodel);
         testmodel.Render();
 
         /* Swap front and back buffers */

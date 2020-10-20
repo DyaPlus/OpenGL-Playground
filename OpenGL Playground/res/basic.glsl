@@ -32,7 +32,7 @@ void main()
     float shininess;
 };*/
 struct Material {
-    sampler2D diffuse;
+    sampler2D diffuse; //Sample unit is set in application code
     sampler2D specular;
     float shininess;
 };
