@@ -56,6 +56,26 @@ void UpdatePosition(Skybox& skybox)
 
 }
 
+void UpdatePositionEnvMap(Model& model,CubeMap& cube_map)
+{
+    for (int i = 0; i < model.GetNumMeshes(); ++i)
+    {
+        glm::mat4 Model = model.GetMesh(i).ModelMat();
+        glm::mat4 View = cam.ViewMat();
+        glm::mat4 MVP = Projection * View * Model;
+
+        model.GetMesh(i).m_ShaderToUse->SetMatrix4("MVP", MVP);
+        model.GetMesh(i).m_ShaderToUse->SetInteger("skybox", 11);
+        glActiveTexture(GL_TEXTURE11); // We set the skybox to be 11
+        cube_map.Bind();
+        if (model.GetMesh(i).m_ShaderToUse->GetType() == ShaderType::Basic)
+        {
+            model.GetMesh(i).m_ShaderToUse->SetMatrix4("Model", Model);
+            model.GetMesh(i).m_ShaderToUse->SetVector3("camPos", cam.m_CamPos);
+        }
+    }
+
+}
 void InitGLFW()
 {
     //GLFW INIT
@@ -96,10 +116,11 @@ int main(void)
     glfwSetCursorPosCallback(window, mouse_callback);
 
     //Create Shaders
-    Shader BasicShader("res\\basic.glsl",ShaderType::Basic);
-    Shader BasicDirShader("res\\basic_dir.glsl", ShaderType::Basic);
-    Shader LightShader("res\\light.glsl", ShaderType::Light);
-    Shader SkyboxShader("res\\skybox_shader.glsl", ShaderType::Basic);
+    Shader BasicShader("res\\shaders\\basic.glsl",ShaderType::Basic);
+    Shader BasicDirShader("res\\shaders\\basic_dir.glsl", ShaderType::Basic);
+    Shader LightShader("res\\shaders\\light.glsl", ShaderType::Light);
+    Shader SkyboxShader("res\\shaders\\skybox_shader.glsl", ShaderType::Basic);
+    Shader EnvMapShader("res\\shaders\\environment_map.glsl", ShaderType::Basic);
 
     //Create Texture
     Texture2D Ceramic("res\\Tiles_035_basecolor.jpg",TextureType::DIFFUSE);
@@ -116,8 +137,8 @@ int main(void)
     LightManager::Get()->AffectShader(BasicShader);
 
     //Create Model
-    Model testmodel("res/guitar/backpack.obj");
-    testmodel.SetShader(&BasicShader);
+    Model testmodel("res/models/backpack/backpack.obj");
+    testmodel.SetShader(&EnvMapShader);
 
     //Create Cubemap
     std::vector<std::string> faces = 
@@ -129,7 +150,7 @@ int main(void)
         "front.jpg",
         "back.jpg"
     };
-    CubeMap cube_map("res/Skybox/skybox/",faces);
+    CubeMap cube_map("res/skybox/skybox1/",faces);
 
     //Create Skybox
     Skybox skybox(&cube_map, &SkyboxShader);
@@ -173,7 +194,7 @@ int main(void)
         UpdatePosition(skybox);
         skybox.Render();
 
-        UpdatePosition(testmodel);
+        UpdatePositionEnvMap(testmodel,cube_map);
         testmodel.Render();
 
         /* Swap front and back buffers */
