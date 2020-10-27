@@ -92,11 +92,10 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
     }
     else //Default textures
     {
-        Texture2D Ceramic("res\\Tiles_035_basecolor.jpg", TextureType::DIFFUSE);
-        Texture2D CeramicSpec("res\\Tiles_035_roughness.jpg", TextureType::SPECULAR);
-        textures.push_back(Ceramic);
-        textures.push_back(CeramicSpec);
-        mat = new MaterialMap();
+        Texture2D* Ceramic = new Texture2D("res\\Tiles_035_basecolor.jpg", TextureType::DIFFUSE);
+        Texture2D* CeramicSpec = new Texture2D("res\\Tiles_035_roughness.jpg", TextureType::SPECULAR);
+        
+        MaterialMap* mat = new MaterialMap(Ceramic, CeramicSpec, 1.0f);
     }
     return Mesh(vertices, indices, mat);
 }
@@ -140,9 +139,9 @@ Model::Model(std::string path)
 
 Model::Model()
 {
-    Texture2D Ceramic("res\\Tiles_035_basecolor.jpg", TextureType::DIFFUSE);
-    Texture2D CeramicSpec("res\\Tiles_035_roughness.jpg", TextureType::SPECULAR);
-    MaterialMap* mat = new MaterialMap(&Ceramic, &CeramicSpec, 32.0f);
+    Texture2D* Ceramic = new Texture2D("res\\Tiles_035_basecolor.jpg", TextureType::DIFFUSE);
+    Texture2D* CeramicSpec = new Texture2D("res\\Tiles_035_roughness.jpg", TextureType::SPECULAR);
+    MaterialMap* mat = new MaterialMap(Ceramic, CeramicSpec, 1.0f);
 
     Mesh cube(get_vertices_v(), mat);
     m_Meshes.push_back(cube);

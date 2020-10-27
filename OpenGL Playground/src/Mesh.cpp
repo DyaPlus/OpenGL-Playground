@@ -45,7 +45,9 @@ Mesh::Mesh(std::vector<Vertex> vertices, MaterialMap* material)
     m_Pos = glm::vec3(0.0f);
     m_Scale = glm::vec3(1.0f);
     m_Rotation = glm::vec3(0.0f);
+
     m_Material = material;
+    
 
     GLuint VAO;
     glGenVertexArrays(1, &VAO);
@@ -78,6 +80,8 @@ void Mesh::SetMat(MaterialMap* mat)
 void Mesh::SetShader(Shader* shader)
 {
     m_ShaderToUse = shader;
+    m_ShaderToUse->SetInteger("material.diffuse", 0);
+    m_ShaderToUse->SetInteger("material.specular", 1);
 }
 
 void Mesh::SetPosition(glm::vec3 new_pos)
@@ -115,6 +119,7 @@ void Mesh::Render()
         //TODO : Texture stuff clean them with no opengl calls
         if (m_Material->m_IsMapped)
         {
+
             glActiveTexture(GL_TEXTURE0); //Activate 0 for diffuse
             m_Material->m_DiffuseMap->Bind();
             glActiveTexture(GL_TEXTURE1); //Activate 1 for diffuse

@@ -119,6 +119,8 @@ int main(void)
 
     //Create Shaders
     Shader BasicShader("res\\shaders\\basic.glsl",ShaderType::Basic); //Basic Phong Shader
+    Shader BasicBlinnShader("res\\shaders\\basic2.glsl", ShaderType::Basic); //Basic Blinn-Phong Shader
+
     Shader BasicDirShader("res\\shaders\\basic_dir.glsl", ShaderType::Basic); 
     Shader LightShader("res\\shaders\\light.glsl", ShaderType::Light);
     Shader SkyboxShader("res\\shaders\\skybox_shader.glsl", ShaderType::Basic); //Box uses it to render skybox
@@ -137,14 +139,15 @@ int main(void)
     DirectionalLight* light2 = LightManager::Get()->CreateDirectionalLight(glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 
     LightManager::Get()->AffectShader(BasicShader);
+    LightManager::Get()->AffectShader(BasicBlinnShader);
 
     //Create Model
     Model testmodel("res/models/backpack/backpack.obj");
-    testmodel.SetShader(&EnvMapShader);
+    testmodel.SetShader(&BasicShader);
 
     Model cubetestmodel;
-    cubetestmodel.SetScale(glm::vec3(10.0f, 1, 1));
-    cubetestmodel.SetShader(&EnvMapShader);
+    cubetestmodel.SetScale(glm::vec3(10.0f, 1, 10));
+    cubetestmodel.SetShader(&BasicBlinnShader);
 
     //Create Cubemap
     std::vector<std::string> faces = 
@@ -185,11 +188,15 @@ int main(void)
         {
             light1->UpdatePosition(1.2 * deltatime);
             light1->AffectShader(BasicShader);
+            light1->AffectShader(BasicBlinnShader);
+
         }
         if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
         {
             light1->UpdatePosition(-1.2 * deltatime);
             light1->AffectShader(BasicShader);
+            light1->AffectShader(BasicBlinnShader);
+
         }
         
 
@@ -200,7 +207,7 @@ int main(void)
         UpdatePosition(skybox);
         skybox.Render();
 
-        UpdatePositionEnvMap(cubetestmodel,cube_map);
+        UpdatePosition(cubetestmodel);
         cubetestmodel.Render();
 
         /* Swap front and back buffers */
