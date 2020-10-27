@@ -1,4 +1,5 @@
 #include "Model.h"
+#include "CubeVertices.h"
 
 void Model::loadModel(std::string path)
 {
@@ -137,6 +138,16 @@ Model::Model(std::string path)
     loadModel(path);
 }
 
+Model::Model()
+{
+    Texture2D Ceramic("res\\Tiles_035_basecolor.jpg", TextureType::DIFFUSE);
+    Texture2D CeramicSpec("res\\Tiles_035_roughness.jpg", TextureType::SPECULAR);
+    MaterialMap* mat = new MaterialMap(&Ceramic, &CeramicSpec, 32.0f);
+
+    Mesh cube(get_vertices_v(), mat);
+    m_Meshes.push_back(cube);
+}
+
 void Model::Render()
 {
     for (unsigned int i = 0; i < m_Meshes.size(); i++)
@@ -150,6 +161,14 @@ void Model::SetPosition(glm::vec3 trans)
     for (auto& mesh : m_Meshes)
     {
         mesh.SetPosition(trans);
+    }
+}
+
+void Model::SetScale(glm::vec3 scale)
+{
+    for (auto& mesh : m_Meshes)
+    {
+        mesh.SetScale(scale);
     }
 }
 
@@ -175,6 +194,6 @@ Model::~Model()
 {
     for (int i = 0; i < m_TexturesLoaded.size(); ++i)
     {
-    delete m_TexturesLoaded[i];
+        delete m_TexturesLoaded[i];
     }
 }

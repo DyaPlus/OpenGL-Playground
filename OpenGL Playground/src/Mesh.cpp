@@ -2,6 +2,7 @@
 
 Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, MaterialMap* material)
 {
+    m_Indexed = true;
     m_Vertices = vertices;
     m_Indices = indices;
 
@@ -27,6 +28,37 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, Mate
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex,m_Normal));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, m_TexCoords));
+    glEnableVertexAttribArray(2);
+
+    glBindVertexArray(0);
+
+    m_ID = VAO;
+}
+
+Mesh::Mesh(std::vector<Vertex> vertices, MaterialMap* material)
+{
+    m_Indexed = false;
+    m_Vertices = vertices;
+
+    m_Pos = glm::vec3(0.0f);
+    m_Scale = glm::vec3(1.0f);
+    m_Rotation = glm::vec3(0.0f);
+    m_Material = material;
+
+    GLuint VAO;
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
+
+    GLuint VBO;
+    glGenBuffers(1, &VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, m_Vertices.size() * sizeof(Vertex), &m_Vertices[0], GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, m_Normal));
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, m_TexCoords));
     glEnableVertexAttribArray(2);
@@ -99,7 +131,14 @@ void Mesh::Render()
     
     m_ShaderToUse->Bind();
     //glDrawArrays(GL_TRIANGLES, 0, 36);
-    glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, 0);
+    if (m_Indexed)
+    {
+        glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, 0);
+    }
+    else
+    {
+        glDrawArrays(GL_TRIANGLES, 0, m_Vertices.size());
+    }
     glBindVertexArray(0);
     m_ShaderToUse->Unbind();
     glActiveTexture(GL_TEXTURE0); //Reset default texture unit

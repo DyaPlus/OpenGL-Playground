@@ -65,9 +65,11 @@ void UpdatePositionEnvMap(Model& model,CubeMap& cube_map)
         glm::mat4 MVP = Projection * View * Model;
 
         model.GetMesh(i).m_ShaderToUse->SetMatrix4("MVP", MVP);
+        //Envmap Updtae
         model.GetMesh(i).m_ShaderToUse->SetInteger("skybox", 11);
         glActiveTexture(GL_TEXTURE11); // We set the skybox to be 11
-        cube_map.Bind();
+        //Envmap Update
+        cube_map.Bind(); // We Bind the cubemap to txture 11
         if (model.GetMesh(i).m_ShaderToUse->GetType() == ShaderType::Basic)
         {
             model.GetMesh(i).m_ShaderToUse->SetMatrix4("Model", Model);
@@ -116,11 +118,11 @@ int main(void)
     glfwSetCursorPosCallback(window, mouse_callback);
 
     //Create Shaders
-    Shader BasicShader("res\\shaders\\basic.glsl",ShaderType::Basic);
-    Shader BasicDirShader("res\\shaders\\basic_dir.glsl", ShaderType::Basic);
+    Shader BasicShader("res\\shaders\\basic.glsl",ShaderType::Basic); //Basic Phong Shader
+    Shader BasicDirShader("res\\shaders\\basic_dir.glsl", ShaderType::Basic); 
     Shader LightShader("res\\shaders\\light.glsl", ShaderType::Light);
-    Shader SkyboxShader("res\\shaders\\skybox_shader.glsl", ShaderType::Basic);
-    Shader EnvMapShader("res\\shaders\\environment_map.glsl", ShaderType::Basic);
+    Shader SkyboxShader("res\\shaders\\skybox_shader.glsl", ShaderType::Basic); //Box uses it to render skybox
+    Shader EnvMapShader("res\\shaders\\environment_map.glsl", ShaderType::Basic); //Model Uses it for EnvMap 
 
     //Create Texture
     Texture2D Ceramic("res\\Tiles_035_basecolor.jpg",TextureType::DIFFUSE);
@@ -140,6 +142,10 @@ int main(void)
     Model testmodel("res/models/backpack/backpack.obj");
     testmodel.SetShader(&EnvMapShader);
 
+    Model cubetestmodel;
+    cubetestmodel.SetScale(glm::vec3(10.0f, 1, 1));
+    cubetestmodel.SetShader(&EnvMapShader);
+
     //Create Cubemap
     std::vector<std::string> faces = 
     {
@@ -153,7 +159,7 @@ int main(void)
     CubeMap cube_map("res/skybox/skybox1/",faces);
 
     //Create Skybox
-    Skybox skybox(&cube_map, &SkyboxShader);
+    Skybox skybox(&cube_map, &SkyboxShader); //Skybox Class taking the cubemap and the shader to render
 
     float cameraSpeed = 2.5f; // adjust accordingly
     float deltatime = 0.0f;	// Time between current frame and last frame
@@ -194,8 +200,8 @@ int main(void)
         UpdatePosition(skybox);
         skybox.Render();
 
-        UpdatePositionEnvMap(testmodel,cube_map);
-        testmodel.Render();
+        UpdatePositionEnvMap(cubetestmodel,cube_map);
+        cubetestmodel.Render();
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);

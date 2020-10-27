@@ -26,9 +26,12 @@ private:
     std::vector<Texture2D*> loadMaterialTextures(aiMaterial* mat, aiTextureType type,TextureType TexType);
 public:
     Model(std::string path);
+    Model(); //Create A Cube
+
     //Public Methods
     void Render();
     void SetPosition(glm::vec3 trans);
+    void SetScale(glm::vec3 scale);
 
     //Utilities
     unsigned int GetNumMeshes() const;

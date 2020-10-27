@@ -20,13 +20,14 @@ private:
 	glm::vec3 m_Rotation;
 
 	std::vector<Vertex> m_Vertices;
+	bool m_Indexed;
 	std::vector<unsigned int> m_Indices;
 	MaterialMap* m_Material;
 public:
 	//TODO REMOVE SHADER FROM MESH
 	Shader* m_ShaderToUse;
 	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, MaterialMap* material);
-	
+	Mesh(std::vector<Vertex> vertices, MaterialMap* material);
 	//Utilities
 	void SetMat(MaterialMap* mat);
 	void SetShader(Shader* shader); //TODO Mesh can't use a shader

@@ -160,6 +160,7 @@
     <ClCompile Include="src\Skybox.cpp" />
     <ClCompile Include="src\Texture2D.cpp" />
     <ClCompile Include="src\vendor\stb_image\stb_image.cpp" />
+    <ClCompile Include="src\‏‏CubeVertices.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Camera.h" />
