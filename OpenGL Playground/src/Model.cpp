@@ -95,7 +95,7 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
         Texture2D* Ceramic = new Texture2D("res\\Tiles_035_basecolor.jpg", TextureType::DIFFUSE);
         Texture2D* CeramicSpec = new Texture2D("res\\Tiles_035_roughness.jpg", TextureType::SPECULAR);
         
-        MaterialMap* mat = new MaterialMap(Ceramic, CeramicSpec, 1.0f);
+        mat = new MaterialMap(Ceramic, CeramicSpec, 1.0f);
     }
     return Mesh(vertices, indices, mat);
 }

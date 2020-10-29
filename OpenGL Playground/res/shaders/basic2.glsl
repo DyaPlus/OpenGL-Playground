@@ -69,7 +69,7 @@ void main()
         vec3 lightColor = light[i].color * attenuation;
 
         //Calculate Ambient Component Using Only Light Color
-        float ambientStrength = 0.08;
+        float ambientStrength = 0.02;
         vec3 ambientCoeff = ambientStrength * light[i].color; //Not affected by attenuation
     
         //Calculate Diffuse Comp
@@ -82,7 +82,7 @@ void main()
         vec3 halfvector = normalize(viewVector + lightVector);
         vec3 specularCoeff = lightColor * vec3(texture(material.specular,ourTexCoord)) * pow(max(dot(halfvector,norm),0),material.shininess);
 
-        result += (diffuseCoeff + ambientCoeff ) * vec3(texture(material.diffuse,ourTexCoord)) + specularCoeff; 
+        result += (diffuseCoeff ) * vec3(texture(material.diffuse,ourTexCoord)) + specularCoeff; 
     }
     FragColor = vec4(result, 1.0);
 }

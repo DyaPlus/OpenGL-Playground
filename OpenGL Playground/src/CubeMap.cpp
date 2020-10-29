@@ -23,7 +23,7 @@ CubeMap::CubeMap(std::string directory, std::vector<std::string> faces)
         Image tex = load_skybox_image((m_Directory + faces[i]).c_str());
         if (tex.data)
         {
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, tex.width, tex.height, 0, GL_RGB, GL_UNSIGNED_BYTE, tex.data);
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_SRGB, tex.width, tex.height, 0, GL_RGB, GL_UNSIGNED_BYTE, tex.data);
         }
         else
         {

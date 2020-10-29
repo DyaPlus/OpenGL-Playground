@@ -20,7 +20,7 @@ Texture2D::Texture2D(const char* filepath , TextureType type)
     glBindTexture(GL_TEXTURE_2D, texture);
     if (tex.data)
     {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, tex.width, tex.height, 0, GL_RGB, GL_UNSIGNED_BYTE, tex.data);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, tex.width, tex.height, 0, GL_RGB, GL_UNSIGNED_BYTE, tex.data);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
     else

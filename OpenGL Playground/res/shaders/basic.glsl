@@ -69,7 +69,7 @@ void main()
         vec3 lightColor = light[i].color * attenuation;
 
         //Calculate Ambient Component Using Only Light Color
-        float ambientStrength = 0.08;
+        float ambientStrength = 0.02;
         vec3 ambientCoeff = ambientStrength * light[i].color; //Not affected by attenuation
     
         //Calculate Diffuse Comp

@@ -169,6 +169,9 @@ int main(void)
     float lastFrame = 0.0f; // Time of last frame
 
     float fps;
+    bool srgb_enable = false;
+    bool srgb_pressed = false;
+
     glEnable(GL_DEPTH_TEST);
     while (!glfwWindowShouldClose(window))
     {
@@ -196,7 +199,27 @@ int main(void)
             light1->UpdatePosition(-1.2 * deltatime);
             light1->AffectShader(BasicShader);
             light1->AffectShader(BasicBlinnShader);
+        }
+        if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && !srgb_pressed)
+        {
+            srgb_pressed = true;
+            if (!srgb_enable)
+            {
+                glEnable(GL_FRAMEBUFFER_SRGB);
+                srgb_enable = true;
+                std::cout << "enabled SRGB" << std::endl;
+            }
+            else if (srgb_enable)
+            {
+                glDisable(GL_FRAMEBUFFER_SRGB);
+                srgb_enable = false;
+                std::cout << "disabled SRGB" << std::endl;
 
+            }
+        }
+        if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE)
+        {
+            srgb_pressed = false;
         }
         
 
