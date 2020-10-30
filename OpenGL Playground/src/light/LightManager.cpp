@@ -44,6 +44,6 @@ void LightManager::AffectShader(Shader& shader)
 		shader.SetFloat(light_element + "quadratic", m_PointLights[i]->m_Quadratic);
 	}
 
-	shader.SetInteger("numberOfActiveLights", m_PointLights.size());
+	shader.SetInteger("numberOfActivePLights", m_PointLights.size());
 	
 }

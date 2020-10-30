@@ -57,11 +57,15 @@ in vec3 viewVector; //After interpolation between vertices of the triangle
 
 uniform Light light[NR_POINT_LIGHTS];
 uniform Material material;
-uniform int numberOfActiveLights;
-void main()
+uniform int numberOfActivePLights;
+
+vec3 EvaluatePointLights()
 {
     vec3 result = vec3(0,0,0);
-    for(int i = 0; i < numberOfActiveLights; ++i) //TODO : numbers of active lights should be set by application
+    vec3 viewVector = normalize(viewVector);
+    vec3 norm = normalize(ourNormal);
+
+    for(int i = 0; i < numberOfActivePLights; ++i) 
     {
         //Calculate light intensity
         float lightDistance = length(light[i].pos - FragPos);
@@ -74,15 +78,22 @@ void main()
     
         //Calculate Diffuse Comp
         vec3 lightVector = normalize(light[i].pos - FragPos);
-        vec3 norm = normalize(ourNormal);
+        
         vec3 diffuseCoeff = max(dot(lightVector,norm),0) * lightColor;
     
         //Calculate Specular Comp
-        vec3 viewVector = normalize(viewVector);
         vec3 reflectedVector = -reflect(lightVector,norm);
         vec3 specularCoeff = lightColor * vec3(texture(material.specular,ourTexCoord)) * pow(max(dot(reflectedVector,viewVector),0),material.shininess);
 
-        result += (diffuseCoeff + ambientCoeff ) * vec3(texture(material.diffuse,ourTexCoord)) + specularCoeff; 
+        result += (diffuseCoeff + ambientCoeff ) * vec3(texture(material.diffuse,ourTexCoord)) + specularCoeff;
     }
+
+    return result;
+}
+
+void main()
+{
+    vec3 result = vec3(0,0,0);
+    result += EvaluatePointLights();
     FragColor = vec4(result, 1.0);
 }

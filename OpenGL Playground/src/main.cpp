@@ -22,7 +22,7 @@ int height = 768;
 // Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
 glm::mat4 Projection = glm::perspective(glm::radians(90.0f), (float)width / (float)height, 0.1f, 100.0f);
 
-Camera cam(glm::vec3(0.0f, 0.0f, 4.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), 2.5f);
+Camera cam(glm::vec3(0.0f, 0.0f, 4.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), 3.5f);
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
@@ -142,7 +142,11 @@ int main(void)
     LightManager::Get()->AffectShader(BasicBlinnShader);
 
     //Create Model
-    Model testmodel("res/models/backpack/backpack.obj");
+    //Model testmodel("res/models/backpack/backpack.obj");
+    Model testmodel("res/models/modern_chair/modern chair 11 obj.obj");
+    testmodel.SetScale(glm::vec3(.05f, 0.05, 0.05));
+    testmodel.SetPosition(glm::vec3(0, 2, 0));
+
     testmodel.SetShader(&BasicShader);
 
     Model cubetestmodel;
@@ -164,13 +168,23 @@ int main(void)
     //Create Skybox
     Skybox skybox(&cube_map, &SkyboxShader); //Skybox Class taking the cubemap and the shader to render
 
-    float cameraSpeed = 2.5f; // adjust accordingly
     float deltatime = 0.0f;	// Time between current frame and last frame
     float lastFrame = 0.0f; // Time of last frame
 
     float fps;
-    bool srgb_enable = false;
+    bool srgb_enable = true;
     bool srgb_pressed = false;
+
+    if (!srgb_enable)
+    {
+        glDisable(GL_FRAMEBUFFER_SRGB);
+    }
+    else if (srgb_enable)
+    {
+        glEnable(GL_FRAMEBUFFER_SRGB);
+        
+
+    }
 
     glEnable(GL_DEPTH_TEST);
     while (!glfwWindowShouldClose(window))
@@ -229,6 +243,9 @@ int main(void)
 		// Draw 
         UpdatePosition(skybox);
         skybox.Render();
+
+        UpdatePosition(testmodel);
+        testmodel.Render();
 
         UpdatePosition(cubetestmodel);
         cubetestmodel.Render();
