@@ -37,7 +37,7 @@ struct Material {
     float shininess;
 };
 
-struct Light {
+struct PointLight {
     vec3 pos;
     vec3 color;
 
@@ -46,7 +46,13 @@ struct Light {
     float quadratic;
 };
 
+struct DirLight {
+    vec3 dir;
+    vec3 color;
+};
+
 #define NR_POINT_LIGHTS 4  
+#define NR_DIR_LIGHTS 1
 
 out vec4 FragColor;
   
@@ -55,9 +61,12 @@ in vec2 ourTexCoord;
 in vec3 FragPos; //After interpolation between vertices of the triangle 
 in vec3 viewVector; //After interpolation between vertices of the triangle 
 
-uniform Light light[NR_POINT_LIGHTS];
+uniform PointLight pointLight[NR_POINT_LIGHTS];
+uniform DirLight dirLight[NR_DIR_LIGHTS];
+
 uniform Material material;
 uniform int numberOfActivePLights;
+uniform int numberOfActiveDLights;
 
 vec3 EvaluatePointLights()
 {
@@ -68,16 +77,12 @@ vec3 EvaluatePointLights()
     for(int i = 0; i < numberOfActivePLights; ++i) //TODO : numbers of active lights should be set by application
     {
         //Calculate light intensity
-        float lightDistance = length(light[i].pos - FragPos);
-        float attenuation = 1 /(light[i].constant + light[i].linear * lightDistance + light[i].quadratic * (lightDistance * lightDistance)); 
-        vec3 lightColor = light[i].color * attenuation;
+        float lightDistance = length(pointLight[i].pos - FragPos);
+        float attenuation = 1 /(pointLight[i].constant + pointLight[i].linear * lightDistance + pointLight[i].quadratic * (lightDistance * lightDistance)); 
+        vec3 lightColor = pointLight[i].color * attenuation;
 
-        //Calculate Ambient Component Using Only Light Color
-        float ambientStrength = 0.02;
-        vec3 ambientCoeff = ambientStrength * light[i].color; //Not affected by attenuation
-    
         //Calculate Diffuse Comp
-        vec3 lightVector = normalize(light[i].pos - FragPos);
+        vec3 lightVector = normalize(pointLight[i].pos - FragPos);
         vec3 diffuseCoeff = max(dot(lightVector,norm),0) * lightColor;
     
         //Calculate Specular Comp Blinn-Phong
@@ -89,10 +94,39 @@ vec3 EvaluatePointLights()
 
     return result;
 }
+vec3 EvaluateDirLights()
+{
+    vec3 result = vec3(0,0,0);
+    vec3 viewVector = normalize(viewVector);
+    vec3 norm = normalize(ourNormal);
+
+    for(int i = 0; i < numberOfActiveDLights; ++i) //TODO : numbers of active lights should be set by application
+    {
+        //Calculate light intensity
+        vec3 lightColor = dirLight[i].color;
+
+        //Calculate Ambient Component Using Only Light Color
+        float ambientStrength = 0.04;
+        vec3 ambientCoeff = ambientStrength * dirLight[i].color; //Not affected by attenuation
+    
+        //Calculate Diffuse Comp
+        vec3 lightVector = -normalize(dirLight[i].dir);
+        vec3 diffuseCoeff = max(dot(lightVector,norm),0) * lightColor;
+    
+        //Calculate Specular Comp Blinn-Phong
+        vec3 halfvector = normalize(viewVector + lightVector);
+        vec3 specularCoeff = smoothstep(0.0f,1.0f,max(dot(lightVector,norm),0)) * lightColor * vec3(texture(material.specular,ourTexCoord)) * pow(max(dot(halfvector,norm),0),material.shininess); 
+
+        result += (diffuseCoeff + ambientCoeff) * vec3(texture(material.diffuse,ourTexCoord)) + specularCoeff; 
+    }
+
+    return result;
+}
+
 
 void main()
 {
     vec3 result = vec3(0,0,0);
-    result += EvaluatePointLights();
+    result += EvaluateDirLights() + EvaluatePointLights();
     FragColor = vec4(result, 1.0);
 }

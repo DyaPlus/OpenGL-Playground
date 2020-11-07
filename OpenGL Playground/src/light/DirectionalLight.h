@@ -7,7 +7,7 @@
 
 class DirectionalLight
 {
-private:
+public:
 	glm::vec3 m_Direction;
 	glm::vec3 m_Color;
 public:
