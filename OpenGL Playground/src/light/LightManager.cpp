@@ -50,6 +50,9 @@ void LightManager::AffectShader(Shader& shader)
 		std::string light_element = "dirLight[" + std::to_string(i) + "].";
 		shader.SetVector3(light_element + "dir", m_DirectionalLights[i]->m_Direction);
 		shader.SetVector3(light_element + "color", m_DirectionalLights[i]->m_Color);
+		//TODO :: currently works for only one directional light
+		shader.SetMatrix4("lightSpaceMatrix", m_DirectionalLights[i]->m_LightSpaceMatrix);
 	}
+	shader.SetInteger("shadowMap", 10);
 	shader.SetInteger("numberOfActiveDLights", m_DirectionalLights.size());
 }

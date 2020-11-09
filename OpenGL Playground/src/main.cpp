@@ -21,9 +21,68 @@ int width = 1024;
 int height = 768;
 // Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
 glm::mat4 Projection = glm::perspective(glm::radians(90.0f), (float)width / (float)height, 0.1f, 100.0f);
-
+GLuint quadVAO= 0 ;
+GLuint quadVBO= 0;
 Camera cam(glm::vec3(0.0f, 0.0f, 4.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), 3.5f);
 
+void RenderLightPOV(DirectionalLight* light,Model model, Shader* shader)
+{
+    glActiveTexture(GL_TEXTURE10);
+    glBindTexture(GL_TEXTURE_2D, light->m_DepthMapTex);
+    for (int i = 0; i < model.GetNumMeshes(); ++i)
+    {
+        glm::mat4 Model = model.GetMesh(i).ModelMat();
+
+        glm::mat4 MVP = light->m_LightSpaceMatrix * Model;
+        shader->SetMatrix4("MVP", MVP);
+        shader->Bind();
+        //TODO : indices and vertices shouldnt be accessed in main
+        glBindVertexArray(model.GetMesh(i).m_ID);
+        if (model.GetMesh(i).m_Indexed)
+        {
+            glDrawElements(GL_TRIANGLES, model.GetMesh(i).m_Indices.size(), GL_UNSIGNED_INT, 0);
+        }
+        else
+        {
+            glDrawArrays(GL_TRIANGLES, 0, model.GetMesh(i).m_Vertices.size());
+        }
+        glBindVertexArray(0);
+        shader->Unbind();
+        glActiveTexture(GL_TEXTURE0); //Reset default texture unit
+    }
+}
+
+void drawShadowMap(DirectionalLight* light,Shader* shadow_shader)
+{
+    shadow_shader->SetInteger("depthMap", 10);
+    shadow_shader->Bind();
+    if (quadVAO == 0)
+    {
+        float quadVertices[] = {
+            // positions        // texture Coords
+            -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+            -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+             1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+             1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+        };
+
+        glGenVertexArrays(1, &quadVAO);
+        glGenBuffers(1, &quadVBO);
+        glBindVertexArray(quadVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+
+    }
+    glBindVertexArray(quadVAO);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindVertexArray(0);
+    shadow_shader->Unbind();
+
+}
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
     cam.Update(xpos, ypos);
@@ -125,6 +184,8 @@ int main(void)
     Shader LightShader("res\\shaders\\light.glsl", ShaderType::Light);
     Shader SkyboxShader("res\\shaders\\skybox_shader.glsl", ShaderType::Basic); //Box uses it to render skybox
     Shader EnvMapShader("res\\shaders\\environment_map.glsl", ShaderType::Basic); //Model Uses it for EnvMap 
+    Shader LightPovShader("res\\shaders\\light_pov.glsl", ShaderType::Light);
+    Shader ShadowShader("res\\shaders\\shadow.glsl", ShaderType::Light);
 
     //Create Texture
     Texture2D Ceramic("res\\Tiles_035_basecolor.jpg",TextureType::DIFFUSE);
@@ -136,7 +197,7 @@ int main(void)
     //Setup Lights
     PointLight * light1 = LightManager::Get()->CreatePointLight(glm::vec3(1.0f, 1000.0f, 2.0f), glm::vec3(1.0f, 1.0f, 1.0f), &LightShader);
 
-    DirectionalLight* light2 = LightManager::Get()->CreateDirectionalLight(glm::vec3(-1.0f, -1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    DirectionalLight* light2 = LightManager::Get()->CreateDirectionalLight(glm::vec3(0.1f, -1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 
     LightManager::Get()->AffectShader(BasicBlinnShader);
 
@@ -235,19 +296,27 @@ int main(void)
             srgb_pressed = false;
         }
         
+        //Update Depth Maps , TODO : Should be controlled by scene object
+        //TODO : only works for one directional light
+        light2->SetDepthMap();
+        RenderLightPOV(light2,testmodel, &LightPovShader);
+        RenderLightPOV(light2,cubetestmodel, &LightPovShader);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-        /* Render here */
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
- 
+
+        //Return to original viewport
+        glViewport(0, 0, width, height);
+        
+
 		// Draw 
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         UpdatePosition(skybox);
         skybox.Render();
-
         UpdatePosition(testmodel);
         testmodel.Render();
-
         UpdatePosition(cubetestmodel);
         cubetestmodel.Render();
+        //drawShadowMap(light2, &ShadowShader);
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);

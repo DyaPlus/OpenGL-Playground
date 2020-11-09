@@ -14,16 +14,16 @@ Thats a perofrmance issue*/
 class Mesh
 {
 private:
-	GLuint m_ID;
 	glm::vec3 m_Pos;
 	glm::vec3 m_Scale;
 	glm::vec3 m_Rotation;
 
-	std::vector<Vertex> m_Vertices;
-	bool m_Indexed;
-	std::vector<unsigned int> m_Indices;
 	MaterialMap* m_Material;
 public:
+	GLuint m_ID; //TODO : should be private
+	std::vector<Vertex> m_Vertices; //TODO : should be private
+	std::vector<unsigned int> m_Indices; //TODO : should be private
+	bool m_Indexed;
 	//TODO REMOVE SHADER FROM MESH
 	Shader* m_ShaderToUse;
 	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, MaterialMap* material);

@@ -4,13 +4,15 @@ layout (location = 0) in vec4 position;
 layout (location = 1) in vec3 normal;
 layout (location = 2) in vec2 texCoord;
 
+
 out vec3 ourNormal;
 out vec2 ourTexCoord;
 out vec3 FragPos;
 out vec3 viewVector;
-
+out vec4 LightPOVFragPos;
 uniform mat4 MVP;
 uniform mat4 Model;
+uniform mat4 lightSpaceMatrix;
 uniform vec3 camPos;
 
 void main()
@@ -21,6 +23,7 @@ void main()
     ourNormal = mat3(transpose(inverse(Model))) * normal;
     ourTexCoord = texCoord;
     viewVector = vec3(camPos - FragPos); //A vector in the direction of the visible vertices
+    LightPOVFragPos = lightSpaceMatrix * Model * position;
 }
 
 #shader fragment
@@ -60,13 +63,33 @@ in vec3 ourNormal;
 in vec2 ourTexCoord; 
 in vec3 FragPos; //After interpolation between vertices of the triangle 
 in vec3 viewVector; //After interpolation between vertices of the triangle 
+in vec4 LightPOVFragPos; //After interpolation between vertices of the triangle 
 
 uniform PointLight pointLight[NR_POINT_LIGHTS];
 uniform DirLight dirLight[NR_DIR_LIGHTS];
 
 uniform Material material;
+uniform sampler2D shadowMap; //TODO :: currently works for only one directional light
+
 uniform int numberOfActivePLights;
 uniform int numberOfActiveDLights;
+
+float ShadowCalculation(vec4 fragPosLightSpace)
+{
+    // perform perspective divide
+    vec3 projCoords = fragPosLightSpace.xyz / 1.0f;
+    // transform to [0,1] range
+    projCoords = projCoords * 0.5 + 0.5;
+    // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
+    float closestDepth = texture(shadowMap, projCoords.xy).r; 
+    // get depth of current fragment from light's perspective
+    float currentDepth = projCoords.z;
+    // check whether current frag pos is in shadow
+    float shadow = currentDepth > closestDepth  ? 1.0 : 0.0;
+
+    return shadow;
+
+}
 
 vec3 EvaluatePointLights()
 {
@@ -111,11 +134,11 @@ vec3 EvaluateDirLights()
     
         //Calculate Diffuse Comp
         vec3 lightVector = -normalize(dirLight[i].dir);
-        vec3 diffuseCoeff = max(dot(lightVector,norm),0) * lightColor;
+        vec3 diffuseCoeff = (1-ShadowCalculation(LightPOVFragPos)) *  max(dot(lightVector,norm),0) * lightColor;
     
         //Calculate Specular Comp Blinn-Phong
         vec3 halfvector = normalize(viewVector + lightVector);
-        vec3 specularCoeff = smoothstep(0.0f,1.0f,max(dot(lightVector,norm),0)) * lightColor * vec3(texture(material.specular,ourTexCoord)) * pow(max(dot(halfvector,norm),0),material.shininess); 
+        vec3 specularCoeff = (1-ShadowCalculation(LightPOVFragPos)) * smoothstep(0.0f,1.0f,max(dot(lightVector,norm),0)) * lightColor * vec3(texture(material.specular,ourTexCoord)) * pow(max(dot(halfvector,norm),0),material.shininess); 
 
         result += (diffuseCoeff + ambientCoeff) * vec3(texture(material.diffuse,ourTexCoord)) + specularCoeff; 
     }
@@ -127,6 +150,6 @@ vec3 EvaluateDirLights()
 void main()
 {
     vec3 result = vec3(0,0,0);
-    result += EvaluateDirLights() + EvaluatePointLights();
+    result += EvaluateDirLights();
     FragColor = vec4(result, 1.0);
 }

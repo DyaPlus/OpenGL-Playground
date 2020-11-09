@@ -119,7 +119,6 @@ void Mesh::Render()
         //TODO : Texture stuff clean them with no opengl calls
         if (m_Material->m_IsMapped)
         {
-
             glActiveTexture(GL_TEXTURE0); //Activate 0 for diffuse
             m_Material->m_DiffuseMap->Bind();
             glActiveTexture(GL_TEXTURE1); //Activate 1 for diffuse
