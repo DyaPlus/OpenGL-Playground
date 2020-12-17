@@ -12,7 +12,7 @@
 #include "Model.h"
 #include "CubeMap.h"
 #include "Skybox.h"
-
+#include "Scene.h"
 #include "light/LightManager.h"
 
 #include "Material.h"
@@ -105,6 +105,8 @@ void UpdatePosition(Model &model)
     }
 
 }
+
+//TODO : Should be added to scene as a model / object , when shader abstraction is added
 void UpdatePosition(Skybox& skybox)
 {
     
@@ -195,7 +197,7 @@ int main(void)
     MaterialMap CeramicMat( &Ceramic, &CeramicSpec,32.0f);
 
     //Setup Lights
-    PointLight * light1 = LightManager::Get()->CreatePointLight(glm::vec3(1.0f, 1000.0f, 2.0f), glm::vec3(1.0f, 1.0f, 1.0f), &LightShader);
+    PointLight * light1 = LightManager::Get()->CreatePointLight(glm::vec3(1.0f, 10.0f, 2.0f), glm::vec3(1.0f, 1.0f, 1.0f), &LightShader);
 
     DirectionalLight* light2 = LightManager::Get()->CreateDirectionalLight(glm::vec3(0.1f, -1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 
@@ -242,11 +244,15 @@ int main(void)
     else if (srgb_enable)
     {
         glEnable(GL_FRAMEBUFFER_SRGB);
-        
-
     }
 
     glEnable(GL_DEPTH_TEST);
+
+    Scene scene1;
+    scene1.AddCamera(&cam);
+    scene1.AddModel(&testmodel);
+    scene1.AddModel(&cubetestmodel);
+
     while (!glfwWindowShouldClose(window))
     {
         float currentFrame = glfwGetTime();
@@ -298,25 +304,22 @@ int main(void)
         
         //Update Depth Maps , TODO : Should be controlled by scene object
         //TODO : only works for one directional light
-        light2->SetDepthMap();
+        /* light2->SetDepthMap();
         RenderLightPOV(light2,testmodel, &LightPovShader);
         RenderLightPOV(light2,cubetestmodel, &LightPovShader);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-
-        //Return to original viewport
-        glViewport(0, 0, width, height);
+        //Return to original viewport 
+        glViewport(0, 0, width, height);*/
         
 
 		// Draw 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        UpdatePosition(skybox);
-        skybox.Render();
-        UpdatePosition(testmodel);
-        testmodel.Render();
-        UpdatePosition(cubetestmodel);
-        cubetestmodel.Render();
-        //drawShadowMap(light2, &ShadowShader);
+       
+        scene1.UpdateDeltatime(deltatime);
+        scene1.Render();
+
+        //drawShadowMap(light2, &ShadowShader); //To draw the shadowDepth map
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);

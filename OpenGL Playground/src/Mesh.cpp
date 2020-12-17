@@ -116,7 +116,6 @@ void Mesh::Render()
 
     if (m_ShaderToUse->GetType() == ShaderType::Basic)
     {
-        //TODO : Texture stuff clean them with no opengl calls
         if (m_Material->m_IsMapped)
         {
             glActiveTexture(GL_TEXTURE0); //Activate 0 for diffuse
@@ -126,15 +125,15 @@ void Mesh::Render()
         }
         else
         {
+            //TODO : Introduce better abstraction for specific shader code
             m_ShaderToUse->SetVector3("material.diffuse", m_Material->m_Diffuse);
             m_ShaderToUse->SetVector3("material.specular", m_Material->m_Specular);
         }
-
+        //TODO : Introduce better abstraction for specific shader code
         m_ShaderToUse->SetFloat("material.shininess", m_Material->m_Shininess);
     }
     
     m_ShaderToUse->Bind();
-    //glDrawArrays(GL_TRIANGLES, 0, 36);
     if (m_Indexed)
     {
         glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, 0);
@@ -143,6 +142,7 @@ void Mesh::Render()
     {
         glDrawArrays(GL_TRIANGLES, 0, m_Vertices.size());
     }
+
     glBindVertexArray(0);
     m_ShaderToUse->Unbind();
     glActiveTexture(GL_TEXTURE0); //Reset default texture unit

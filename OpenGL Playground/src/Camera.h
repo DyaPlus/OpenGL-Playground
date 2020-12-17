@@ -1,3 +1,6 @@
+#ifndef CAMERA_H
+#define CAMERA_H
+
 #include "vendor/glm/gtc/matrix_transform.hpp"
 
 class Camera 
@@ -5,6 +8,7 @@ class Camera
 private:
 	glm::vec3 m_CamFront;
 	glm::vec3 m_CamUp;
+	glm::mat4 m_Projection;
 	bool m_FirstMouse;
 	float m_LastX;
 	float m_LastY;
@@ -22,4 +26,7 @@ public:
 	void Left(float deltatime);
 	void Right(float deltatime);
 	glm::mat4 ViewMat();
+	glm::mat4 ProjectionMat();
 };
+
+#endif
