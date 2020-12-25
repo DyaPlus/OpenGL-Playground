@@ -91,3 +91,4 @@ void Camera::Right(float deltatime)
 {
     m_CamPos += glm::normalize(glm::cross(m_CamFront, m_CamUp)) * m_Speed * deltatime;
 }
+

@@ -1,5 +1,7 @@
 #include "Scene.h"
 
+Scene* Scene::active_scene;
+
 void Scene::AddModel(Model* model)
 {
     m_Models.push_back(model);
@@ -50,3 +52,17 @@ void Scene::UpdateDeltatime(float deltaTime)
 {
     m_DeltaTime = deltaTime;
 }
+
+void Scene::mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+    m_ActiveCamera->Update(xpos, ypos);
+}
+
+void Scene::mouse_callback_dispacth(GLFWwindow* window, double xpos, double ypos)
+{
+    if (active_scene)
+    {
+        active_scene->mouse_callback(window, xpos, ypos);
+    }
+}
+

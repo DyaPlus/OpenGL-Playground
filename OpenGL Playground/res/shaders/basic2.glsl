@@ -23,7 +23,7 @@ void main()
     ourNormal = mat3(transpose(inverse(Model))) * normal;
     ourTexCoord = texCoord;
     viewVector = vec3(camPos - FragPos); //A vector in the direction of the visible vertices
-    LightPOVFragPos = lightSpaceMatrix * Model * position;
+    //LightPOVFragPos = lightSpaceMatrix * Model * position;
 }
 
 #shader fragment

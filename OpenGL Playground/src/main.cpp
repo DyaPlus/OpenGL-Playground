@@ -20,125 +20,105 @@
 int width = 1024;
 int height = 768;
 // Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
-glm::mat4 Projection = glm::perspective(glm::radians(90.0f), (float)width / (float)height, 0.1f, 100.0f);
-GLuint quadVAO= 0 ;
-GLuint quadVBO= 0;
+//glm::mat4 Projection = glm::perspective(glm::radians(90.0f), (float)width / (float)height, 0.1f, 100.0f);
+//GLuint quadVAO = 0 ;
+//GLuint quadVBO = 0;
+
 Camera cam(glm::vec3(0.0f, 0.0f, 4.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), 3.5f);
 
-void RenderLightPOV(DirectionalLight* light,Model model, Shader* shader)
-{
-    glActiveTexture(GL_TEXTURE10);
-    glBindTexture(GL_TEXTURE_2D, light->m_DepthMapTex);
-    for (int i = 0; i < model.GetNumMeshes(); ++i)
-    {
-        glm::mat4 Model = model.GetMesh(i).ModelMat();
+//void RenderLightPOV(DirectionalLight* light,Model model, Shader* shader)
+//{
+//    glActiveTexture(GL_TEXTURE10);
+//    glBindTexture(GL_TEXTURE_2D, light->m_DepthMapTex);
+//    for (int i = 0; i < model.GetNumMeshes(); ++i)
+//    {
+//        glm::mat4 Model = model.GetMesh(i).ModelMat();
+//
+//        glm::mat4 MVP = light->m_LightSpaceMatrix * Model;
+//        shader->SetMatrix4("MVP", MVP);
+//        shader->Bind();
+//        //TODO : indices and vertices shouldnt be accessed in main
+//        glBindVertexArray(model.GetMesh(i).m_ID);
+//        if (model.GetMesh(i).m_Indexed)
+//        {
+//            glDrawElements(GL_TRIANGLES, model.GetMesh(i).m_Indices.size(), GL_UNSIGNED_INT, 0);
+//        }
+//        else
+//        {
+//            glDrawArrays(GL_TRIANGLES, 0, model.GetMesh(i).m_Vertices.size());
+//        }
+//        glBindVertexArray(0);
+//        shader->Unbind();
+//        glActiveTexture(GL_TEXTURE0); //Reset default texture unit
+//    }
+//}
+//
+//void drawShadowMap(DirectionalLight* light,Shader* shadow_shader)
+//{
+//    shadow_shader->SetInteger("depthMap", 10);
+//    shadow_shader->Bind();
+//    if (quadVAO == 0)
+//    {
+//        float quadVertices[] = {
+//            // positions        // texture Coords
+//            -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+//            -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+//             1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+//             1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+//        };
+//
+//        glGenVertexArrays(1, &quadVAO);
+//        glGenBuffers(1, &quadVBO);
+//        glBindVertexArray(quadVAO);
+//        glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+//        glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+//        glEnableVertexAttribArray(0);
+//        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+//        glEnableVertexAttribArray(1);
+//        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+//
+//    }
+//    glBindVertexArray(quadVAO);
+//    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+//    glBindVertexArray(0);
+//    shadow_shader->Unbind();
+//
+//}
+//
+////TODO : Should be added to scene as a model / object , when shader abstraction is added
+//void UpdatePosition(Skybox& skybox)
+//{
+//    
+//    glm::mat4 View = glm::mat4(glm::mat3(cam.ViewMat()));
+//    glm::mat4 MVP = Projection * View;
+//
+//    skybox.m_ShaderToUse->SetMatrix4("MVP", MVP);
+//
+//}
+//
+//void UpdatePositionEnvMap(Model& model,CubeMap& cube_map)
+//{
+//    for (int i = 0; i < model.GetNumMeshes(); ++i)
+//    {
+//        glm::mat4 Model = model.GetMesh(i).ModelMat();
+//        glm::mat4 View = cam.ViewMat();
+//        glm::mat4 MVP = Projection * View * Model;
+//
+//        model.GetMesh(i).m_ShaderToUse->SetMatrix4("MVP", MVP);
+//        //Envmap Updtae
+//        model.GetMesh(i).m_ShaderToUse->SetInteger("skybox", 11);
+//        glActiveTexture(GL_TEXTURE11); // We set the skybox to be 11
+//        //Envmap Update
+//        cube_map.Bind(); // We Bind the cubemap to txture 11
+//        if (model.GetMesh(i).m_ShaderToUse->GetType() == ShaderType::Basic)
+//        {
+//            model.GetMesh(i).m_ShaderToUse->SetMatrix4("Model", Model);
+//            model.GetMesh(i).m_ShaderToUse->SetVector3("camPos", cam.m_CamPos);
+//        }
+//    }
+//
+//}
 
-        glm::mat4 MVP = light->m_LightSpaceMatrix * Model;
-        shader->SetMatrix4("MVP", MVP);
-        shader->Bind();
-        //TODO : indices and vertices shouldnt be accessed in main
-        glBindVertexArray(model.GetMesh(i).m_ID);
-        if (model.GetMesh(i).m_Indexed)
-        {
-            glDrawElements(GL_TRIANGLES, model.GetMesh(i).m_Indices.size(), GL_UNSIGNED_INT, 0);
-        }
-        else
-        {
-            glDrawArrays(GL_TRIANGLES, 0, model.GetMesh(i).m_Vertices.size());
-        }
-        glBindVertexArray(0);
-        shader->Unbind();
-        glActiveTexture(GL_TEXTURE0); //Reset default texture unit
-    }
-}
-
-void drawShadowMap(DirectionalLight* light,Shader* shadow_shader)
-{
-    shadow_shader->SetInteger("depthMap", 10);
-    shadow_shader->Bind();
-    if (quadVAO == 0)
-    {
-        float quadVertices[] = {
-            // positions        // texture Coords
-            -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
-            -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-             1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-             1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-        };
-
-        glGenVertexArrays(1, &quadVAO);
-        glGenBuffers(1, &quadVBO);
-        glBindVertexArray(quadVAO);
-        glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-
-    }
-    glBindVertexArray(quadVAO);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    glBindVertexArray(0);
-    shadow_shader->Unbind();
-
-}
-void mouse_callback(GLFWwindow* window, double xpos, double ypos)
-{
-    cam.Update(xpos, ypos);
-}
-
-void UpdatePosition(Model &model)
-{  
-    for (int i = 0; i < model.GetNumMeshes(); ++i)
-    {
-        glm::mat4 Model = model.GetMesh(i).ModelMat();
-        glm::mat4 View = cam.ViewMat();
-        glm::mat4 MVP = Projection * View * Model;
-
-        model.GetMesh(i).m_ShaderToUse->SetMatrix4("MVP", MVP);
-        if (model.GetMesh(i).m_ShaderToUse->GetType() == ShaderType::Basic)
-        {       
-            model.GetMesh(i).m_ShaderToUse->SetMatrix4("Model", Model);
-            model.GetMesh(i).m_ShaderToUse->SetVector3("camPos", cam.m_CamPos);
-        }
-    }
-
-}
-
-//TODO : Should be added to scene as a model / object , when shader abstraction is added
-void UpdatePosition(Skybox& skybox)
-{
-    
-    glm::mat4 View = glm::mat4(glm::mat3(cam.ViewMat()));
-    glm::mat4 MVP = Projection * View;
-
-    skybox.m_ShaderToUse->SetMatrix4("MVP", MVP);
-
-}
-
-void UpdatePositionEnvMap(Model& model,CubeMap& cube_map)
-{
-    for (int i = 0; i < model.GetNumMeshes(); ++i)
-    {
-        glm::mat4 Model = model.GetMesh(i).ModelMat();
-        glm::mat4 View = cam.ViewMat();
-        glm::mat4 MVP = Projection * View * Model;
-
-        model.GetMesh(i).m_ShaderToUse->SetMatrix4("MVP", MVP);
-        //Envmap Updtae
-        model.GetMesh(i).m_ShaderToUse->SetInteger("skybox", 11);
-        glActiveTexture(GL_TEXTURE11); // We set the skybox to be 11
-        //Envmap Update
-        cube_map.Bind(); // We Bind the cubemap to txture 11
-        if (model.GetMesh(i).m_ShaderToUse->GetType() == ShaderType::Basic)
-        {
-            model.GetMesh(i).m_ShaderToUse->SetMatrix4("Model", Model);
-            model.GetMesh(i).m_ShaderToUse->SetVector3("camPos", cam.m_CamPos);
-        }
-    }
-
-}
 void InitGLFW()
 {
     //GLFW INIT
@@ -174,14 +154,16 @@ int main(void)
     }
     glfwMakeContextCurrent(window); 
     InitGLEW();
+
     //TODO associate with a scene object
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    glfwSetCursorPosCallback(window, mouse_callback);
+    Scene scene1;
+    Scene::active_scene = &scene1;
+    glfwSetCursorPosCallback(window, scene1.mouse_callback_dispacth);
 
     //Create Shaders
     Shader BasicShader("res\\shaders\\basic.glsl",ShaderType::Basic); //Basic Phong Shader
     Shader BasicBlinnShader("res\\shaders\\basic2.glsl", ShaderType::Basic); //Basic Blinn-Phong Shader
-
     Shader BasicDirShader("res\\shaders\\basic_dir.glsl", ShaderType::Basic); 
     Shader LightShader("res\\shaders\\light.glsl", ShaderType::Light);
     Shader SkyboxShader("res\\shaders\\skybox_shader.glsl", ShaderType::Basic); //Box uses it to render skybox
@@ -208,7 +190,6 @@ int main(void)
     Model testmodel("res/models/modern_chair/modern chair 11 obj.obj");
     testmodel.SetScale(glm::vec3(.05f, 0.05, 0.05));
     testmodel.SetPosition(glm::vec3(0, 2, 0));
-
     testmodel.SetShader(&BasicBlinnShader);
 
     Model cubetestmodel;
@@ -248,7 +229,6 @@ int main(void)
 
     glEnable(GL_DEPTH_TEST);
 
-    Scene scene1;
     scene1.AddCamera(&cam);
     scene1.AddModel(&testmodel);
     scene1.AddModel(&cubetestmodel);
