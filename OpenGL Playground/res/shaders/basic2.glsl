@@ -150,7 +150,7 @@ vec3 EvaluateDirLights()
     
         //Calculate Specular Comp Blinn-Phong
         vec3 halfvector = normalize(viewVector + lightVector);
-        vec3 specularCoeff = (1-ShadowCalculation(LightPOVFragPos)) * smoothstep(0.0f,1.0f,max(dot(lightVector,norm),0)) * lightColor * vec3(texture(material.specular,ourTexCoord)) * pow(max(dot(halfvector,norm),0),material.shininess); 
+        vec3 specularCoeff = lightColor * vec3(texture(material.specular,ourTexCoord)) * pow(max(dot(halfvector,norm),0),material.shininess); 
 
         result += (diffuseCoeff + ambientCoeff) * vec3(texture(material.diffuse,ourTexCoord)) + specularCoeff; 
     }

@@ -68,6 +68,8 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
     // process material
     //TODO : simplify or improve
     //TODO : handle default material if failed to load the required textures and remove the hack
+    //TODO : Default Material must initilaized once in the start of the program and reused and should be handled with parameters only
+
     MaterialMap* mat;
     if (mesh->mMaterialIndex >= 0)
     {
@@ -76,26 +78,26 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
             aiTextureType_DIFFUSE, TextureType::DIFFUSE);
         if (diffuseMaps.size() == 0)
         {
-            Texture2D Ceramic("res\\Tiles_035_basecolor.jpg", TextureType::DIFFUSE);
-            diffuseMaps.push_back(new Texture2D(Ceramic));
+            Texture2D DefaultTex("res/default/texture/def_COLOR.jpg", TextureType::DIFFUSE);
+            diffuseMaps.push_back(new Texture2D(DefaultTex));
         }
         //textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
         std::vector<Texture2D*> specularMaps = loadMaterialTextures(material,
             aiTextureType_SPECULAR, TextureType::SPECULAR);
         if (specularMaps.size() == 0)
         {
-            Texture2D CeramicSpec("res\\Tiles_035_roughness.jpg", TextureType::SPECULAR);
-            specularMaps.push_back(new Texture2D(CeramicSpec));
+            Texture2D DefaultTexSpec("res/default/texture/def_SPECULAR.jpg", TextureType::SPECULAR);
+            specularMaps.push_back(new Texture2D(DefaultTexSpec));
         }
         //textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
         mat = new MaterialMap(diffuseMaps[0], specularMaps[0], 32.0f); //TODO shininess should be choosable
     }
     else //Default textures
     {
-        Texture2D* Ceramic = new Texture2D("res\\Tiles_035_basecolor.jpg", TextureType::DIFFUSE);
-        Texture2D* CeramicSpec = new Texture2D("res\\Tiles_035_roughness.jpg", TextureType::SPECULAR);
+        Texture2D* DefaultTex = new Texture2D("res/default/texture/def_COLOR.jpg", TextureType::DIFFUSE);
+        Texture2D* DefaultTexSpec = new Texture2D("res/default/texture/def_SPECULAR.jpg", TextureType::SPECULAR);
         
-        mat = new MaterialMap(Ceramic, CeramicSpec, 1.0f);
+        mat = new MaterialMap(DefaultTex, DefaultTexSpec, 1.0f);
     }
     return Mesh(vertices, indices, mat);
 }
@@ -139,9 +141,9 @@ Model::Model(std::string path)
 
 Model::Model()
 {
-    Texture2D* Ceramic = new Texture2D("res\\Tiles_035_basecolor.jpg", TextureType::DIFFUSE);
-    Texture2D* CeramicSpec = new Texture2D("res\\Tiles_035_roughness.jpg", TextureType::SPECULAR);
-    MaterialMap* mat = new MaterialMap(Ceramic, CeramicSpec, 1.0f);
+    Texture2D* DefaultTex = new Texture2D("res/default/texture/def_COLOR.jpg", TextureType::DIFFUSE);
+    Texture2D* DefaultTexSpec = new Texture2D("res/default/texture/def_SPECULAR.jpg", TextureType::SPECULAR);
+    MaterialMap* mat = new MaterialMap(DefaultTex, DefaultTexSpec, 128.0f);
 
     Mesh cube(get_vertices_v(), mat);
     m_Meshes.push_back(cube);

@@ -143,9 +143,9 @@ void InitGLEW()
 
 int main(void)
 {
-    InitGLFW();
     // Open a window and create its OpenGL context
-    GLFWwindow* window; // (In the accompanying source code, this variable is global for simplicity)
+    InitGLFW();
+    GLFWwindow* window; 
     window = glfwCreateWindow(width, height, "Tutorial 01", NULL, NULL);
     if (window == NULL) {
         fprintf(stderr, "Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n");
@@ -155,7 +155,6 @@ int main(void)
     glfwMakeContextCurrent(window); 
     InitGLEW();
 
-    //TODO associate with a scene object
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     Scene scene1;
     Scene::active_scene = &scene1;
@@ -164,7 +163,6 @@ int main(void)
     //Create Shaders
     Shader BasicShader("res\\shaders\\basic.glsl",ShaderType::Basic); //Basic Phong Shader
     Shader BasicBlinnShader("res\\shaders\\basic2.glsl", ShaderType::Basic); //Basic Blinn-Phong Shader
-    Shader BasicDirShader("res\\shaders\\basic_dir.glsl", ShaderType::Basic); 
     Shader LightShader("res\\shaders\\light.glsl", ShaderType::Light);
     Shader SkyboxShader("res\\shaders\\skybox_shader.glsl", ShaderType::Basic); //Box uses it to render skybox
     Shader EnvMapShader("res\\shaders\\environment_map.glsl", ShaderType::Basic); //Model Uses it for EnvMap 
@@ -181,21 +179,25 @@ int main(void)
     //Setup Lights
     PointLight * light1 = LightManager::Get()->CreatePointLight(glm::vec3(1.0f, 10.0f, 2.0f), glm::vec3(1.0f, 1.0f, 1.0f), &LightShader);
 
-    DirectionalLight* light2 = LightManager::Get()->CreateDirectionalLight(glm::vec3(0.1f, -1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    //DirectionalLight* light2 = LightManager::Get()->CreateDirectionalLight(glm::vec3(0.1f, -1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 
     LightManager::Get()->AffectShader(BasicBlinnShader);
 
     //Create Model
     //Model testmodel("res/models/backpack/backpack.obj");
-    Model testmodel("res/models/modern_chair/modern chair 11 obj.obj");
+    /*Model testmodel("res/models/modern_chair/modern chair 11 obj.obj");
     testmodel.SetScale(glm::vec3(.05f, 0.05, 0.05));
     testmodel.SetPosition(glm::vec3(0, 2, 0));
-    testmodel.SetShader(&BasicBlinnShader);
+    testmodel.SetShader(&BasicBlinnShader);*/
 
     Model cubetestmodel;
     cubetestmodel.SetScale(glm::vec3(10.0f, 1, 10));
     cubetestmodel.SetShader(&BasicBlinnShader);
 
+    Model naruto("res/models/naruto/D0401253.obj");
+    naruto.SetScale(glm::vec3(0.1f, 0.1f, 0.1f));
+    naruto.SetPosition(glm::vec3(0, 1, 0));
+    naruto.SetShader(&BasicBlinnShader);
     //Create Cubemap
     std::vector<std::string> faces = 
     {
@@ -211,13 +213,14 @@ int main(void)
     //Create Skybox
     Skybox skybox(&cube_map, &SkyboxShader); //Skybox Class taking the cubemap and the shader to render
 
+    //Util
     float deltatime = 0.0f;	// Time between current frame and last frame
     float lastFrame = 0.0f; // Time of last frame
-
     float fps;
     bool srgb_enable = true;
     bool srgb_pressed = false;
 
+    //Configure SRGB
     if (!srgb_enable)
     {
         glDisable(GL_FRAMEBUFFER_SRGB);
@@ -227,12 +230,12 @@ int main(void)
         glEnable(GL_FRAMEBUFFER_SRGB);
     }
 
-    glEnable(GL_DEPTH_TEST);
-
+    //Configure Scene
     scene1.AddCamera(&cam);
-    scene1.AddModel(&testmodel);
+    scene1.AddModel(&naruto);
     scene1.AddModel(&cubetestmodel);
 
+    glEnable(GL_DEPTH_TEST);
     while (!glfwWindowShouldClose(window))
     {
         float currentFrame = glfwGetTime();
