@@ -114,22 +114,28 @@ void Mesh::Render()
 {
     glBindVertexArray(m_ID);
 
+    //TODO : Introduce better abstraction for specific shader code
+
     if (m_ShaderToUse->GetType() == ShaderType::Basic)
     {
-        if (m_Material->m_IsMapped)
+        m_ShaderToUse->SetVector3("material.Kd", m_Material->m_Diffuse);
+        m_ShaderToUse->SetVector3("material.Ks", m_Material->m_Specular);
+
+        if (m_Material->m_IsMapped & 0b100)
         {
             glActiveTexture(GL_TEXTURE0); //Activate 0 for diffuse
             m_Material->m_DiffuseMap->Bind();
+        }
+        if (m_Material->m_IsMapped & 0b010)
+        {
             glActiveTexture(GL_TEXTURE1); //Activate 1 for diffuse
             m_Material->m_SpecularMap->Bind();
         }
-        else
+        if (m_Material->m_IsMapped & 0b001)
         {
-            //TODO : Introduce better abstraction for specific shader code
-            m_ShaderToUse->SetVector3("material.diffuse", m_Material->m_Diffuse);
-            m_ShaderToUse->SetVector3("material.specular", m_Material->m_Specular);
+            glActiveTexture(GL_TEXTURE2); //Activate 1 for diffuse
+            m_Material->m_NormalMap->Bind();
         }
-        //TODO : Introduce better abstraction for specific shader code
         m_ShaderToUse->SetFloat("material.shininess", m_Material->m_Shininess);
     }
     

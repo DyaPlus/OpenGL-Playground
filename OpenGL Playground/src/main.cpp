@@ -198,6 +198,7 @@ int main(void)
     naruto.SetScale(glm::vec3(0.1f, 0.1f, 0.1f));
     naruto.SetPosition(glm::vec3(0, 1, 0));
     naruto.SetShader(&BasicBlinnShader);
+    
     //Create Cubemap
     std::vector<std::string> faces = 
     {
