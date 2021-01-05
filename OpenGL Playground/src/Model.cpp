@@ -143,7 +143,8 @@ Model::Model()
 {
     Texture2D* DefaultTex = new Texture2D("res/default/texture/def_COLOR.jpg", TextureType::DIFFUSE);
     Texture2D* DefaultTexSpec = new Texture2D("res/default/texture/def_SPECULAR.jpg", TextureType::SPECULAR);
-    MaterialMap* mat = new MaterialMap(DefaultTex, DefaultTexSpec, 128.0f);
+    Texture2D* DefaultTexNormal = new Texture2D("res/default/texture/def_Normal.jpg", TextureType::NORMAL);
+    MaterialMap* mat = new MaterialMap(DefaultTex, DefaultTexSpec, DefaultTexNormal, 32.0f);
 
     Mesh cube(get_vertices_v(), mat);
     m_Meshes.push_back(cube);
@@ -170,6 +171,14 @@ void Model::SetScale(glm::vec3 scale)
     for (auto& mesh : m_Meshes)
     {
         mesh.SetScale(scale);
+    }
+}
+
+void Model::SetRotation(glm::vec3 rotation)
+{
+    for (auto& mesh : m_Meshes)
+    {
+        mesh.SetRotation(rotation);
     }
 }
 

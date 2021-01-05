@@ -177,9 +177,9 @@ int main(void)
     MaterialMap CeramicMat( &Ceramic, &CeramicSpec,32.0f);
 
     //Setup Lights
-    PointLight * light1 = LightManager::Get()->CreatePointLight(glm::vec3(1.0f, 10.0f, 2.0f), glm::vec3(1.0f, 1.0f, 1.0f), &LightShader);
+    PointLight * light1 = LightManager::Get()->CreatePointLight(glm::vec3(1.0f, 500.0f, 2.0f), glm::vec3(1.0f, 1.0f, 1.0f), &LightShader);
 
-    //DirectionalLight* light2 = LightManager::Get()->CreateDirectionalLight(glm::vec3(0.1f, -1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    DirectionalLight* light2 = LightManager::Get()->CreateDirectionalLight(glm::vec3(0.1f, -1.0f, -1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 
     LightManager::Get()->AffectShader(BasicBlinnShader);
 
@@ -191,6 +191,8 @@ int main(void)
     testmodel.SetShader(&BasicBlinnShader);*/
 
     Model cubetestmodel;
+    cubetestmodel.SetRotation(glm::vec3(90, 0, 0));
+    cubetestmodel.SetPosition(glm::vec3(0, 3, -3.5f));
     cubetestmodel.SetScale(glm::vec3(10.0f, 1, 10));
     cubetestmodel.SetShader(&BasicBlinnShader);
 

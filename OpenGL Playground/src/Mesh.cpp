@@ -73,15 +73,20 @@ Mesh::Mesh(std::vector<Vertex> vertices, MaterialMap* material)
 void Mesh::SetMat(MaterialMap* mat)
 {
     m_Material = mat;
+    //TODO : shader dependent code
     m_ShaderToUse->SetInteger("material.diffuse", 0);
     m_ShaderToUse->SetInteger("material.specular", 1);
+    m_ShaderToUse->SetInteger("material.normal", 2);
 }
 
 void Mesh::SetShader(Shader* shader)
 {
     m_ShaderToUse = shader;
+    //TODO : shader dependent code
     m_ShaderToUse->SetInteger("material.diffuse", 0);
     m_ShaderToUse->SetInteger("material.specular", 1);
+    m_ShaderToUse->SetInteger("material.normal", 2);
+
 }
 
 void Mesh::SetPosition(glm::vec3 new_pos)
@@ -96,18 +101,19 @@ void Mesh::SetScale(glm::vec3 new_scale)
 
 void Mesh::SetRotation(glm::vec3 new_rot)
 {
+    new_rot = glm::vec3(glm::radians(new_rot.x), glm::radians(new_rot.y), glm::radians(new_rot.z));
     m_Rotation = new_rot;
 }
 
 glm::mat4 Mesh::ModelMat()
 {
-    glm::mat4 trans_mat = glm::translate(glm::mat4(1.0f), m_Pos);
-    glm::mat4 rotation_mat = glm::rotate(trans_mat, m_Rotation.x ,glm::vec3(1,0,0));
+    glm::mat4 scale_mat = glm::scale(glm::mat4(1.0f), m_Scale);
+    glm::mat4 rotation_mat = glm::rotate(glm::mat4(1.0f), m_Rotation.x ,glm::vec3(1,0,0));
     rotation_mat = glm::rotate(rotation_mat, m_Rotation.y, glm::vec3(0, 1, 0));
     rotation_mat = glm::rotate(rotation_mat, m_Rotation.z, glm::vec3(0, 0, 1));
-    glm::mat4 scale_mat = glm::scale(rotation_mat, m_Scale);
+    glm::mat4 trans_mat = glm::translate(glm::mat4(1.0f), m_Pos);
 
-    return scale_mat;
+    return trans_mat * rotation_mat * scale_mat;
 }
 
 void Mesh::Render()
@@ -115,7 +121,7 @@ void Mesh::Render()
     glBindVertexArray(m_ID);
 
     //TODO : Introduce better abstraction for specific shader code
-
+    //TODO : Introduce mapper for the material maps
     if (m_ShaderToUse->GetType() == ShaderType::Basic)
     {
         m_ShaderToUse->SetVector3("material.Kd", m_Material->m_Diffuse);

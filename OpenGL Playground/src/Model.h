@@ -35,6 +35,7 @@ public:
     void Render();
     void SetPosition(glm::vec3 trans);
     void SetScale(glm::vec3 scale);
+    void SetRotation(glm::vec3 rotation);
 
     //Utilities
     unsigned int GetNumMeshes() const;

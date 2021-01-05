@@ -6,7 +6,7 @@
 
 enum class TextureType
 {
-	DIFFUSE , SPECULAR
+	DIFFUSE , SPECULAR , NORMAL
 };
 class Texture2D
 {
