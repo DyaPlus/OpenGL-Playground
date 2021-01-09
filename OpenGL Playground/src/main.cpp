@@ -158,30 +158,30 @@ int main(void)
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     Scene scene1;
     Scene::active_scene = &scene1;
-    glfwSetCursorPosCallback(window, scene1.mouse_callback_dispacth);
+    glfwSetCursorPosCallback(window, Scene::mouse_callback_dispacth);
 
     //Create Shaders
-    Shader BasicShader("res\\shaders\\basic.glsl",ShaderType::Basic); //Basic Phong Shader
+   // Shader BasicShader("res\\shaders\\basic.glsl",ShaderType::Basic); //Basic Phong Shader
     Shader BasicBlinnShader("res\\shaders\\basic2.glsl", ShaderType::Basic); //Basic Blinn-Phong Shader
     Shader LightShader("res\\shaders\\light.glsl", ShaderType::Light);
-    Shader SkyboxShader("res\\shaders\\skybox_shader.glsl", ShaderType::Basic); //Box uses it to render skybox
-    Shader EnvMapShader("res\\shaders\\environment_map.glsl", ShaderType::Basic); //Model Uses it for EnvMap 
-    Shader LightPovShader("res\\shaders\\light_pov.glsl", ShaderType::Light);
-    Shader ShadowShader("res\\shaders\\shadow.glsl", ShaderType::Light);
+    //Shader SkyboxShader("res\\shaders\\skybox_shader.glsl", ShaderType::Basic); //Box uses it to render skybox
+    //Shader EnvMapShader("res\\shaders\\environment_map.glsl", ShaderType::Basic); //Model Uses it for EnvMap 
+    //Shader LightPovShader("res\\shaders\\light_pov.glsl", ShaderType::Light);
+    //Shader ShadowShader("res\\shaders\\shadow.glsl", ShaderType::Light);
 
     //Create Texture
     Texture2D Ceramic("res\\Tiles_035_basecolor.jpg",TextureType::DIFFUSE);
     Texture2D CeramicSpec("res\\Tiles_035_roughness.jpg", TextureType::SPECULAR);
 
     //Create Materials
-    MaterialMap CeramicMat( &Ceramic, &CeramicSpec,32.0f);
+    Material CeramicMat( &Ceramic, &CeramicSpec,32.0f);
 
     //Setup Lights
-    PointLight * light1 = LightManager::Get()->CreatePointLight(glm::vec3(1.0f, 500.0f, 2.0f), glm::vec3(1.0f, 1.0f, 1.0f), &LightShader);
+    //PointLight * light1 = LightManager::Get()->CreatePointLight(glm::vec3(1.0f, 500.0f, 2.0f), glm::vec3(1.0f, 1.0f, 1.0f), &LightShader);
 
-    DirectionalLight* light2 = LightManager::Get()->CreateDirectionalLight(glm::vec3(0.1f, -1.0f, -1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    DirectionalLight* light2 = LightManager::Get()->CreateDirectionalLight(glm::vec3(0, 0, -2.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 
-    LightManager::Get()->AffectShader(BasicBlinnShader);
+    LightManager::Get()->AffectShader(&BasicBlinnShader);
 
     //Create Model
     //Model testmodel("res/models/backpack/backpack.obj");
@@ -194,12 +194,10 @@ int main(void)
     cubetestmodel.SetRotation(glm::vec3(90, 0, 0));
     cubetestmodel.SetPosition(glm::vec3(0, 3, -3.5f));
     cubetestmodel.SetScale(glm::vec3(10.0f, 1, 10));
-    cubetestmodel.SetShader(&BasicBlinnShader);
 
     Model naruto("res/models/naruto/D0401253.obj");
     naruto.SetScale(glm::vec3(0.1f, 0.1f, 0.1f));
     naruto.SetPosition(glm::vec3(0, 1, 0));
-    naruto.SetShader(&BasicBlinnShader);
     
     //Create Cubemap
     std::vector<std::string> faces = 
@@ -214,7 +212,7 @@ int main(void)
     CubeMap cube_map("res/skybox/skybox1/",faces);
 
     //Create Skybox
-    Skybox skybox(&cube_map, &SkyboxShader); //Skybox Class taking the cubemap and the shader to render
+    //Skybox skybox(&cube_map, &SkyboxShader); //Skybox Class taking the cubemap and the shader to render
 
     //Util
     float deltatime = 0.0f;	// Time between current frame and last frame
@@ -235,6 +233,7 @@ int main(void)
 
     //Configure Scene
     scene1.AddCamera(&cam);
+    scene1.AddShader(&BasicBlinnShader);
     scene1.AddModel(&naruto);
     scene1.AddModel(&cubetestmodel);
 
@@ -255,16 +254,12 @@ int main(void)
             cam.Right(deltatime);
         if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
         {
-            light1->UpdatePosition(1.2 * deltatime);
-            light1->AffectShader(BasicShader);
-            light1->AffectShader(BasicBlinnShader);
+            //light1->UpdatePosition(1.2 * deltatime);
 
         }
         if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
         {
-            light1->UpdatePosition(-1.2 * deltatime);
-            light1->AffectShader(BasicShader);
-            light1->AffectShader(BasicBlinnShader);
+            //light1->UpdatePosition(-1.2 * deltatime);
         }
         if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && !srgb_pressed)
         {

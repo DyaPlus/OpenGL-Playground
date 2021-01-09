@@ -1,6 +1,6 @@
 #include "Mesh.h"
 
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, MaterialMap* material)
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, Material* material)
 {
     m_Indexed = true;
     m_Vertices = vertices;
@@ -37,7 +37,7 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, Mate
     m_ID = VAO;
 }
 
-Mesh::Mesh(std::vector<Vertex> vertices, MaterialMap* material)
+Mesh::Mesh(std::vector<Vertex> vertices, Material* material)
 {
     m_Indexed = false;
     m_Vertices = vertices;
@@ -70,23 +70,13 @@ Mesh::Mesh(std::vector<Vertex> vertices, MaterialMap* material)
     m_ID = VAO;
 }
 
-void Mesh::SetMat(MaterialMap* mat)
+void Mesh::SetMat(Material* mat)
 {
     m_Material = mat;
     //TODO : shader dependent code
-    m_ShaderToUse->SetInteger("material.diffuse", 0);
-    m_ShaderToUse->SetInteger("material.specular", 1);
-    m_ShaderToUse->SetInteger("material.normal", 2);
-}
-
-void Mesh::SetShader(Shader* shader)
-{
-    m_ShaderToUse = shader;
-    //TODO : shader dependent code
-    m_ShaderToUse->SetInteger("material.diffuse", 0);
-    m_ShaderToUse->SetInteger("material.specular", 1);
-    m_ShaderToUse->SetInteger("material.normal", 2);
-
+    m_Material->m_ShaderToUse->SetInteger("material.diffuse", 0);
+    m_Material->m_ShaderToUse->SetInteger("material.specular", 1);
+    m_Material->m_ShaderToUse->SetInteger("material.normal", 2);
 }
 
 void Mesh::SetPosition(glm::vec3 new_pos)
@@ -119,33 +109,10 @@ glm::mat4 Mesh::ModelMat()
 void Mesh::Render()
 {
     glBindVertexArray(m_ID);
-
-    //TODO : Introduce better abstraction for specific shader code
-    //TODO : Introduce mapper for the material maps
-    if (m_ShaderToUse->GetType() == ShaderType::Basic)
-    {
-        m_ShaderToUse->SetVector3("material.Kd", m_Material->m_Diffuse);
-        m_ShaderToUse->SetVector3("material.Ks", m_Material->m_Specular);
-
-        if (m_Material->m_IsMapped & 0b100)
-        {
-            glActiveTexture(GL_TEXTURE0); //Activate 0 for diffuse
-            m_Material->m_DiffuseMap->Bind();
-        }
-        if (m_Material->m_IsMapped & 0b010)
-        {
-            glActiveTexture(GL_TEXTURE1); //Activate 1 for diffuse
-            m_Material->m_SpecularMap->Bind();
-        }
-        if (m_Material->m_IsMapped & 0b001)
-        {
-            glActiveTexture(GL_TEXTURE2); //Activate 1 for diffuse
-            m_Material->m_NormalMap->Bind();
-        }
-        m_ShaderToUse->SetFloat("material.shininess", m_Material->m_Shininess);
-    }
     
-    m_ShaderToUse->Bind();
+    m_Material->BindValues();
+
+    m_Material->m_ShaderToUse->Bind();
     if (m_Indexed)
     {
         glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, 0);
@@ -156,7 +123,7 @@ void Mesh::Render()
     }
 
     glBindVertexArray(0);
-    m_ShaderToUse->Unbind();
+    m_Material->m_ShaderToUse->Unbind();
     glActiveTexture(GL_TEXTURE0); //Reset default texture unit
 }
 

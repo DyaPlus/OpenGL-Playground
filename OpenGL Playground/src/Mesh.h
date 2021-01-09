@@ -4,7 +4,6 @@
 #include <vector>
 #include "GLEW/include/GL/glew.h"
 #include "vendor/glm/gtc/matrix_transform.hpp"
-#include "Shader.h"
 #include "Material.h"
 #include "Vertex.h"
 /*A simple mesh class
@@ -18,19 +17,18 @@ private:
 	glm::vec3 m_Scale;
 	glm::vec3 m_Rotation;
 
-	MaterialMap* m_Material;
 public:
+	Material* m_Material;
 	GLuint m_ID; //TODO : should be private
 	std::vector<Vertex> m_Vertices; //TODO : should be private
 	std::vector<unsigned int> m_Indices; //TODO : should be private
 	bool m_Indexed;
-	//TODO REMOVE SHADER FROM MESH
-	Shader* m_ShaderToUse;
-	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, MaterialMap* material);
-	Mesh(std::vector<Vertex> vertices, MaterialMap* material);
+
+	//TODO add a constructor without explicit material as argument for default materials
+	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, Material* material);
+	Mesh(std::vector<Vertex> vertices, Material* material);
 	//Utilities
-	void SetMat(MaterialMap* mat);
-	void SetShader(Shader* shader); //TODO Mesh can't use a shader
+	void SetMat(Material* mat);
 
 	void SetPosition(glm::vec3 new_pos);
 	void SetScale(glm::vec3 new_scale);

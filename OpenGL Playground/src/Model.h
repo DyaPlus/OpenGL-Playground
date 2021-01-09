@@ -22,12 +22,13 @@ private:
     std::vector<Mesh> m_Meshes;
     std::string m_Directory;
     std::vector<Texture2D*> m_TexturesLoaded;
-
     void loadModel(std::string path);
     void processNode(aiNode* node, const aiScene* scene);
     Mesh processMesh(aiMesh* mesh, const aiScene* scene);
     std::vector<Texture2D*> loadMaterialTextures(aiMaterial* mat, aiTextureType type,TextureType TexType);
 public:
+    //TODO : find a better way to pass
+    std::vector<Material*> m_MaterialsCreated;//For adding already created models to the active scene the model was added into
     Model(std::string path);
     Model(); //Create A Cube
 
@@ -39,7 +40,6 @@ public:
 
     //Utilities
     unsigned int GetNumMeshes() const;
-    void SetShader(Shader* shader);
     Mesh GetMesh(unsigned int number) const;
     ~Model();
 };

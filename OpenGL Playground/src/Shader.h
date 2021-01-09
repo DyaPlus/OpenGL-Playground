@@ -44,5 +44,4 @@ ShaderSource ParseShader(const std::string& filepath); //Parse a given shader fi
 void CompileShader(GLuint id);
 GLuint LoadShader(ShaderSource& Source); //Load Shader Into A Program
 
-
 #endif

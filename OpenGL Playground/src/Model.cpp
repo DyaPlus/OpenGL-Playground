@@ -68,9 +68,8 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
     // process material
     //TODO : simplify or improve
     //TODO : handle default material if failed to load the required textures and remove the hack
-    //TODO : Default Material must initilaized once in the start of the program and reused and should be handled with parameters only
 
-    MaterialMap* mat;
+    Material* mat;
     if (mesh->mMaterialIndex >= 0)
     {
         aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
@@ -90,15 +89,16 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
             specularMaps.push_back(new Texture2D(DefaultTexSpec));
         }
         //textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
-        mat = new MaterialMap(diffuseMaps[0], specularMaps[0], 32.0f); //TODO shininess should be choosable
+        mat = new Material(diffuseMaps[0], specularMaps[0], 32.0f); //TODO shininess should be choosable
     }
     else //Default textures
     {
         Texture2D* DefaultTex = new Texture2D("res/default/texture/def_COLOR.jpg", TextureType::DIFFUSE);
         Texture2D* DefaultTexSpec = new Texture2D("res/default/texture/def_SPECULAR.jpg", TextureType::SPECULAR);
         
-        mat = new MaterialMap(DefaultTex, DefaultTexSpec, 1.0f);
+        mat = new Material(DefaultTex, DefaultTexSpec, 32.0f);
     }
+    m_MaterialsCreated.push_back(mat); //TODO Model shouldnt hold info of the material
     return Mesh(vertices, indices, mat);
 }
 
@@ -144,7 +144,12 @@ Model::Model()
     Texture2D* DefaultTex = new Texture2D("res/default/texture/def_COLOR.jpg", TextureType::DIFFUSE);
     Texture2D* DefaultTexSpec = new Texture2D("res/default/texture/def_SPECULAR.jpg", TextureType::SPECULAR);
     Texture2D* DefaultTexNormal = new Texture2D("res/default/texture/def_Normal.jpg", TextureType::NORMAL);
-    MaterialMap* mat = new MaterialMap(DefaultTex, DefaultTexSpec, DefaultTexNormal, 32.0f);
+    Material* mat = new Material(); 
+    mat->SetDiffuseMap(DefaultTex);
+    mat->SetNormalMap(DefaultTexNormal);
+    mat->SetKa(glm::vec3(1.0));
+
+    m_MaterialsCreated.push_back(mat); //TODO Model shouldnt hold info of the material
 
     Mesh cube(get_vertices_v(), mat);
     m_Meshes.push_back(cube);
@@ -187,13 +192,6 @@ unsigned int Model::GetNumMeshes() const
     return m_Meshes.size();
 }
 
-void Model::SetShader(Shader* shader)
-{
-    for (unsigned int i = 0; i < m_Meshes.size(); i++)
-    {
-        m_Meshes[i].SetShader(shader);
-    }
-}
 
 Mesh Model::GetMesh(unsigned int number) const
 {

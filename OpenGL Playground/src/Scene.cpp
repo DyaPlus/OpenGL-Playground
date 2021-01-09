@@ -4,7 +4,14 @@ Scene* Scene::active_scene;
 
 void Scene::AddModel(Model* model)
 {
+    //TODO : Very bad code -> -> -> 
+    //The code defaults all materials to the first available shader
+    //The first available shader is assumed to be the Blinn Phong as it is the current default of the application
     m_Models.push_back(model);
+    for (int i = 0; i < model->m_MaterialsCreated.size(); i++)
+    {
+        model->m_MaterialsCreated[i]->SetShader(m_Shaders[0]);
+    }
 }
 
 void Scene::AddCamera(Camera* camera)
@@ -14,6 +21,11 @@ void Scene::AddCamera(Camera* camera)
     {
         m_ActiveCamera = camera;
     }
+}
+
+void Scene::AddShader(Shader* shader)
+{
+    m_Shaders.push_back(shader);
 }
 
 void Scene::Render()
@@ -39,11 +51,11 @@ void Scene::UpdateShaderParameters(Model* model)
         glm::mat4 MVP = m_ActiveCamera->ProjectionMat() * View * Model;
 
         //Shader dependent code (TODO : Introduce a better abstraction)
-        model->GetMesh(i).m_ShaderToUse->SetMatrix4("MVP", MVP);
-        if (model->GetMesh(i).m_ShaderToUse->GetType() == ShaderType::Basic)
+        model->GetMesh(i).m_Material->m_ShaderToUse->SetMatrix4("MVP", MVP);
+        if (model->GetMesh(i).m_Material->m_ShaderToUse->GetType() == ShaderType::Basic)
         {
-            model->GetMesh(i).m_ShaderToUse->SetMatrix4("Model", Model);
-            model->GetMesh(i).m_ShaderToUse->SetVector3("camPos", m_ActiveCamera->m_CamPos);
+            model->GetMesh(i).m_Material->m_ShaderToUse->SetMatrix4("Model", Model);
+            model->GetMesh(i).m_Material->m_ShaderToUse->SetVector3("camPos", m_ActiveCamera->m_CamPos);
         }
     }
 }

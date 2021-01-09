@@ -17,7 +17,7 @@ public:
 	static LightManager* Get();
 	PointLight* CreatePointLight(glm::vec3 pos, glm::vec3 color, Shader* shader);
 	DirectionalLight* CreateDirectionalLight(glm::vec3 direction, glm::vec3 color);
-	void AffectShader(Shader& shader);
+	void AffectShader(Shader* shader);
 
 
 };

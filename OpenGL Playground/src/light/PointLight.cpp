@@ -12,8 +12,6 @@ void PointLight::SetMesh(Mesh* mesh)
 {
 	m_Mesh = mesh;
 	m_Mesh->SetPosition(m_Pos);
-	m_Mesh->m_ShaderToUse = m_ShaderToUse;
-	m_ShaderToUse->SetVector3("color", m_Color);
 }
 
 void PointLight::SetFalloffParam(float constant, float linear, float quad)
