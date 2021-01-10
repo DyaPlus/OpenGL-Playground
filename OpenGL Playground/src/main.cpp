@@ -177,9 +177,9 @@ int main(void)
     Material CeramicMat( &Ceramic, &CeramicSpec,32.0f);
 
     //Setup Lights
-    //PointLight * light1 = LightManager::Get()->CreatePointLight(glm::vec3(1.0f, 500.0f, 2.0f), glm::vec3(1.0f, 1.0f, 1.0f), &LightShader);
+    PointLight * light1 = LightManager::Get()->CreatePointLight(glm::vec3(0, 3.0f, 3.0f), glm::vec3(1.0f, 1.0f, 1.0f), &LightShader);
 
-    DirectionalLight* light2 = LightManager::Get()->CreateDirectionalLight(glm::vec3(0, 0, -2.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    //DirectionalLight* light2 = LightManager::Get()->CreateDirectionalLight(glm::vec3(0, 0, -2.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 
     LightManager::Get()->AffectShader(&BasicBlinnShader);
 

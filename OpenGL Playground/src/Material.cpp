@@ -31,7 +31,7 @@ void Material::SetKd(glm::vec3 diffuse)
 	m_Diffuse = diffuse;
 }
 
-void Material::SetKa(glm::vec3 specular)
+void Material::SetKs(glm::vec3 specular)
 {
 	m_Specular = specular;
 }

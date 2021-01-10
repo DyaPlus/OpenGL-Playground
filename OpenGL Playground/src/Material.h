@@ -28,7 +28,7 @@ public:
         m_IsMapped = 0b111;
     }
     Material() //basic white color
-        :m_Diffuse(glm::vec3(1.0)), m_Specular(glm::vec3(0)), m_Shininess(0)
+        :m_Diffuse(glm::vec3(1.0)), m_Specular(glm::vec3(0)), m_Shininess(1)
     {
         m_IsMapped = 0b000;
     }
@@ -39,7 +39,7 @@ public:
     void SetSpecularMap(Texture2D* specular);
     void SetNormalMap(Texture2D* normal);
     void SetKd(glm::vec3 diffuse);
-    void SetKa(glm::vec3 specular);
+    void SetKs(glm::vec3 specular);
     void SetShininess(float shineness);
 
     void RemoveDiffuseMap();

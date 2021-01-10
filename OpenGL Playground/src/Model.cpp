@@ -141,16 +141,15 @@ Model::Model(std::string path)
 
 Model::Model()
 {
-    Texture2D* DefaultTex = new Texture2D("res/default/texture/def_COLOR.jpg", TextureType::DIFFUSE);
+    Texture2D* DefaultTex = new Texture2D("res/default/texture/def2_COLOR.jpg", TextureType::DIFFUSE);
     Texture2D* DefaultTexSpec = new Texture2D("res/default/texture/def_SPECULAR.jpg", TextureType::SPECULAR);
-    Texture2D* DefaultTexNormal = new Texture2D("res/default/texture/def_Normal.jpg", TextureType::NORMAL);
+    Texture2D* DefaultTexNormal = new Texture2D("res/default/texture/def2_Normal.jpg", TextureType::NORMAL);
     Material* mat = new Material(); 
-    //mat->SetDiffuseMap(DefaultTex);
-    //mat->SetNormalMap(DefaultTexNormal);
-    mat->SetKd(glm::vec3(0, 1, 0));
-    mat->SetKa(glm::vec3(1.0));
-    mat->SetShininess(32.0f);
-    m_MaterialsCreated.push_back(mat); //TODO Model shouldnt hold info of the material
+    mat->SetDiffuseMap(DefaultTex);
+    mat->SetNormalMap(DefaultTexNormal);
+    mat->SetKs(glm::vec3(1));
+    mat->SetShininess(128.0f);
+    m_MaterialsCreated.push_back(mat); //TODO Model class shouldnt hold info of the material or create it
 
     Mesh cube(get_vertices_v(), mat);
     m_Meshes.push_back(cube);
