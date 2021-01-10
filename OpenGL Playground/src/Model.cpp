@@ -96,7 +96,7 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
         Texture2D* DefaultTex = new Texture2D("res/default/texture/def_COLOR.jpg", TextureType::DIFFUSE);
         Texture2D* DefaultTexSpec = new Texture2D("res/default/texture/def_SPECULAR.jpg", TextureType::SPECULAR);
         
-        mat = new Material(DefaultTex, DefaultTexSpec, 32.0f);
+        mat = new Material(DefaultTex, DefaultTexSpec, 1.0f);
     }
     m_MaterialsCreated.push_back(mat); //TODO Model shouldnt hold info of the material
     return Mesh(vertices, indices, mat);
@@ -145,10 +145,11 @@ Model::Model()
     Texture2D* DefaultTexSpec = new Texture2D("res/default/texture/def_SPECULAR.jpg", TextureType::SPECULAR);
     Texture2D* DefaultTexNormal = new Texture2D("res/default/texture/def_Normal.jpg", TextureType::NORMAL);
     Material* mat = new Material(); 
-    mat->SetDiffuseMap(DefaultTex);
-    mat->SetNormalMap(DefaultTexNormal);
+    //mat->SetDiffuseMap(DefaultTex);
+    //mat->SetNormalMap(DefaultTexNormal);
+    mat->SetKd(glm::vec3(0, 1, 0));
     mat->SetKa(glm::vec3(1.0));
-
+    mat->SetShininess(32.0f);
     m_MaterialsCreated.push_back(mat); //TODO Model shouldnt hold info of the material
 
     Mesh cube(get_vertices_v(), mat);

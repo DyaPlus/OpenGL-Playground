@@ -68,7 +68,7 @@ void Material::BindValues()
     {
         m_ShaderToUse->SetVector3("material.Kd", m_Diffuse);
         m_ShaderToUse->SetVector3("material.Ks", m_Specular);
-
+        m_ShaderToUse->SetInteger("material.mapping", m_IsMapped);
         if (m_IsMapped & 0b100)
         {
             glActiveTexture(GL_TEXTURE0); //Activate 0 for diffuse
