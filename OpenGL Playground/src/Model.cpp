@@ -4,7 +4,7 @@
 void Model::loadModel(std::string path)
 {
     Assimp::Importer importer;
-    const aiScene* scene = aiImportFile(path.c_str(), aiProcess_Triangulate | aiProcess_FlipUVs ); //Tringulate the meshes + flip UVs for opengl 
+    const aiScene* scene = aiImportFile(path.c_str(), aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace ); //Tringulate the meshes + flip UVs for opengl + Calculate tangents for normal mapping
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
@@ -44,6 +44,8 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
         // process vertex positions, normals and texture coordinates
         vertex.m_Position = glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
         vertex.m_Normal = glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
+        vertex.m_Tangent = glm::vec3(mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z);
+        //TODO Precalculate the bittangent
         if (mesh->mTextureCoords[0])
         {
             vertex.m_TexCoords = glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y);
@@ -60,7 +62,7 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
     {
         for (unsigned int j = 0; j < mesh->mFaces[i].mNumIndices; j++)
         {
-            indices.push_back(mesh->mFaces[i].mIndices[j]);
+            indices.push_back(mesh->mFaces[i].mIndices[j]); 
         }
     }
    

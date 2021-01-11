@@ -29,10 +29,10 @@ public:
 	Mesh(std::vector<Vertex> vertices, Material* material);
 	//Utilities
 	void SetMat(Material* mat);
-
 	void SetPosition(glm::vec3 new_pos);
 	void SetScale(glm::vec3 new_scale);
 	void SetRotation(glm::vec3 new_rot);
+	void CalculateTangents();
 
 	glm::mat4 ModelMat();
 	void Render();
