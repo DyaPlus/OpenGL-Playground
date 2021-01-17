@@ -161,7 +161,7 @@ int main(void)
     glfwSetCursorPosCallback(window, Scene::mouse_callback_dispacth);
 
     //Create Shaders
-   // Shader BasicShader("res\\shaders\\basic.glsl",ShaderType::Basic); //Basic Phong Shader
+    // Shader BasicShader("res\\shaders\\basic.glsl",ShaderType::Basic); //Basic Phong Shader
     Shader BasicBlinnShader("res\\shaders\\basic2.glsl", ShaderType::Basic); //Basic Blinn-Phong Shader
     Shader LightShader("res\\shaders\\light.glsl", ShaderType::Light);
     //Shader SkyboxShader("res\\shaders\\skybox_shader.glsl", ShaderType::Basic); //Box uses it to render skybox
@@ -177,9 +177,9 @@ int main(void)
     Material CeramicMat( &Ceramic, &CeramicSpec,32.0f);
 
     //Setup Lights
-    PointLight * light1 = LightManager::Get()->CreatePointLight(glm::vec3(0, 3.0f, 3.0f), glm::vec3(1.0f, 1.0f, 1.0f), &LightShader);
+    //PointLight * light1 = LightManager::Get()->CreatePointLight(glm::vec3(0, 10.0f, 2.0f), glm::vec3(1.0f, 1.0f, 1.0f), &LightShader);
 
-    //DirectionalLight* light2 = LightManager::Get()->CreateDirectionalLight(glm::vec3(0, 0, -2.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    DirectionalLight* light2 = LightManager::Get()->CreateDirectionalLight(glm::vec3(0, 0, -2.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 
     LightManager::Get()->AffectShader(&BasicBlinnShader);
 
@@ -228,7 +228,7 @@ int main(void)
     }
     else if (srgb_enable)
     {
-        glEnable(GL_FRAMEBUFFER_SRGB);
+        glEnable(GL_FRAMEBUFFER_SRGB); //Inform opengl that the incoming fragment values are in linear space , so force conversion
     }
 
     //Configure Scene
