@@ -2,7 +2,7 @@
 #define MESH_H
 
 #include <vector>
-#include "GLEW/include/GL/glew.h"
+#include "GL/glew.h"
 #include "vendor/glm/gtc/matrix_transform.hpp"
 #include "Material.h"
 #include "Vertex.h"

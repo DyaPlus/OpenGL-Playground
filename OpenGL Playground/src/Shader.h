@@ -7,7 +7,7 @@
 #include <sstream>
 #include <vector>
 #include <unordered_map>
-#include "GLEW/include/GL/glew.h"
+#include "GL/glew.h"
 #include "vendor/glm/gtc/matrix_transform.hpp"
 
 struct ShaderSource {

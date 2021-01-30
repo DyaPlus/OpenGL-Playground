@@ -1,7 +1,7 @@
 #ifndef CUBEMAP_H
 #define CUBEMAP_H
 
-#include "GLEW/include/GL/glew.h"
+#include "GL/glew.h"
 #include <vector>
 #include <iostream>
 

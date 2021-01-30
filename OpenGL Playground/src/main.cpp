@@ -2,8 +2,8 @@
 #include "Shader.h"
 #include "Texture2D.h"
 #include "Camera.h"
-#include "GLEW/include/GL/glew.h"
-#include "GLFW/include/GLFW/glfw3.h"
+#include "GL/glew.h"
+#include "GLFW/glfw3.h"
 #include <iostream>
 #include <filesystem>
 #include <string>
@@ -14,6 +14,11 @@
 #include "Skybox.h"
 #include "Scene.h"
 #include "light/LightManager.h"
+
+//IMGUI
+#include "vendor/imgui/imgui.h"
+#include "vendor/imgui/imgui_impl_glfw.h"
+#include "vendor/imgui/imgui_impl_opengl3.h"
 
 #include "Material.h"
 
@@ -143,7 +148,7 @@ void InitGLEW()
 
 int main(void)
 {
-    // Open a window and create its OpenGL context
+    // GLFW Init
     InitGLFW();
     GLFWwindow* window; 
     window = glfwCreateWindow(width, height, "Tutorial 01", NULL, NULL);
@@ -153,9 +158,20 @@ int main(void)
         return -1;
     }
     glfwMakeContextCurrent(window); 
+    //GLEW Init
     InitGLEW();
 
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    //IMGUI Init
+    // Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    // Setup Platform/Renderer backends
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init("#version 330 core");
+
+
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     Scene scene1;
     Scene::active_scene = &scene1;
     glfwSetCursorPosCallback(window, Scene::mouse_callback_dispacth);
@@ -240,6 +256,30 @@ int main(void)
     glEnable(GL_DEPTH_TEST);
     while (!glfwWindowShouldClose(window))
     {
+        // Start the Dear ImGui frame
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+        // 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
+        {
+            static float f = 0.0f;
+            static int counter = 0;
+
+            ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+
+            ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+            
+
+            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+            if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+                counter++;
+            ImGui::SameLine();
+            ImGui::Text("counter = %d", counter);
+
+            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+            ImGui::End();
+        }
+
         float currentFrame = glfwGetTime();
         deltatime = currentFrame - lastFrame;
         lastFrame = currentFrame;
@@ -296,9 +336,11 @@ int main(void)
 
 		// Draw 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-       
         scene1.UpdateDeltatime(deltatime);
         scene1.Render();
+        // Rendering
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         //drawShadowMap(light2, &ShadowShader); //To draw the shadowDepth map
 
@@ -309,5 +351,13 @@ int main(void)
         glfwPollEvents();
 		
     }
+    // Cleanup
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+
+    glfwDestroyWindow(window);
+    glfwTerminate();
+
     std::cout << fps << std::endl;
 }

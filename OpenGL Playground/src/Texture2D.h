@@ -1,7 +1,7 @@
 #ifndef TEXTURE2D_H
 #define TEXTURE2D_H
 
-#include "GLEW/include/GL/glew.h"
+#include "GL/glew.h"
 #include <iostream>
 
 enum class TextureType

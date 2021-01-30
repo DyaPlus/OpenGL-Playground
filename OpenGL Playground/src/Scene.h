@@ -3,7 +3,7 @@
 #include "Model.h"
 #include "Camera.h"
 #include "Shader.h"
-#include "GLFW/include/GLFW/glfw3.h"
+#include "GLFW/glfw3.h"
 #include "vector"
 
 
@@ -20,10 +20,14 @@ public:
 	void AddModel(Model* model);
 	void AddCamera(Camera* camera);
 	void AddShader(Shader* shader);
-	void Render();
+
+
 	void OnUpdate();
+	void UpdateDeltatime(float deltaTime); //Supplied by the main application
+
 	void UpdateShaderParameters(Model* model);
-	void UpdateDeltatime(float deltaTime);
+	void Render();
+
 	void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 	void static mouse_callback_dispacth(GLFWwindow* window, double xpos, double ypos);
 };
