@@ -1,5 +1,4 @@
 #include "Model.h"
-#include "CubeVertices.h"
 
 void Model::loadModel(std::string path)
 {
@@ -95,11 +94,14 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
     }
     else //Default textures
     {
-        Texture2D* DefaultTex = new Texture2D("res/default/texture/def_COLOR.jpg", TextureType::DIFFUSE);
+        Texture2D* DefaultTex = new Texture2D("res/default/texture/def2_COLOR.jpg", TextureType::DIFFUSE);
         Texture2D* DefaultTexSpec = new Texture2D("res/default/texture/def_SPECULAR.jpg", TextureType::SPECULAR);
+        Texture2D* DefaultTexNormal = new Texture2D("res/default/texture/def2_Normal.jpg", TextureType::NORMAL);
         
-        mat = new Material(DefaultTex, DefaultTexSpec, 1.0f);
+        mat = new Material(DefaultTex, DefaultTexSpec , DefaultTexNormal, 1.0f);
     }
+    
+
     m_MaterialsCreated.push_back(mat); //TODO Model shouldnt hold info of the material
     return Mesh(vertices, indices, mat);
 }
@@ -136,25 +138,15 @@ std::vector<Texture2D*> Model::loadMaterialTextures(aiMaterial* mat, aiTextureTy
     return textures;
 }
 
-Model::Model(std::string path)
+Model::Model(std::string path, std::string name)
 {
     loadModel(path);
+    m_Name = name;
 }
 
-Model::Model()
+Model::Model(std::string name)
 {
-    Texture2D* DefaultTex = new Texture2D("res/default/texture/def2_COLOR.jpg", TextureType::DIFFUSE);
-    Texture2D* DefaultTexSpec = new Texture2D("res/default/texture/def_SPECULAR.jpg", TextureType::SPECULAR);
-    Texture2D* DefaultTexNormal = new Texture2D("res/default/texture/def2_Normal.jpg", TextureType::NORMAL);
-    Material* mat = new Material(); 
-    mat->SetDiffuseMap(DefaultTex);
-    mat->SetNormalMap(DefaultTexNormal);
-    mat->SetKs(glm::vec3(1));
-    mat->SetShininess(128.0f);
-    m_MaterialsCreated.push_back(mat); //TODO Model class shouldnt hold info of the material or create it
-
-    Mesh cube(get_vertices_v(), mat);
-    m_Meshes.push_back(cube);
+    m_Name = name; //TODO : we default it to cube as it is currently used for GUI Listing
 }
 
 void Model::Render()
@@ -187,6 +179,11 @@ void Model::SetRotation(glm::vec3 rotation)
     {
         mesh.SetRotation(rotation);
     }
+}
+
+std::string Model::GetName()
+{
+	return m_Name;
 }
 
 unsigned int Model::GetNumMeshes() const

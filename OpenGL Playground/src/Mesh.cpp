@@ -104,7 +104,7 @@ void Mesh::CalculateTangents() //NOTE : Used for un indexed meshes only , as the
 {
     if (!m_Indexed)
     {
-        for (int i = 0; i < m_Vertices.size(); i+=3)
+        for (int i = 0; i < m_Vertices.size(); i = i + 3)
         {
             glm::vec3 tangent;
             //Calculate The edge vectors of the triangle

@@ -65,6 +65,24 @@ void Scene::UpdateDeltatime(float deltaTime)
     m_DeltaTime = deltaTime;
 }
 
+void Scene::ToggleFPSMode(GLFWwindow* window)
+{
+    if (m_FPSMode)
+    {
+        m_FPSMode = false;
+        //TODO : disable the camera properly by reseting last known mouse position
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        glfwSetCursorPosCallback(window, Scene::mouse_callback_nav_dispacth);
+    }
+    else
+    {
+        m_FPSMode = true;
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        glfwSetCursorPosCallback(window, Scene::mouse_callback_dispacth);
+
+    }
+}
+
 void Scene::mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
     m_ActiveCamera->Update(xpos, ypos);
@@ -76,5 +94,9 @@ void Scene::mouse_callback_dispacth(GLFWwindow* window, double xpos, double ypos
     {
         active_scene->mouse_callback(window, xpos, ypos);
     }
+}
+
+void Scene::mouse_callback_nav_dispacth(GLFWwindow* window, double xpos, double ypos)
+{
 }
 

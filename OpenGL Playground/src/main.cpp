@@ -10,8 +10,7 @@
 #include "vendor/glm/gtc/matrix_transform.hpp"
 #include "Mesh.h"
 #include "Model.h"
-#include "CubeMap.h"
-#include "Skybox.h"
+#include "Shapes.h"
 #include "Scene.h"
 #include "light/LightManager.h"
 
@@ -31,6 +30,10 @@ int height = 768;
 
 Camera cam(glm::vec3(0.0f, 0.0f, 4.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), 3.5f);
 
+void boom()
+{
+    ImGui::Text("Models = %d",10);
+}
 //void RenderLightPOV(DirectionalLight* light,Model model, Shader* shader)
 //{
 //    glActiveTexture(GL_TEXTURE10);
@@ -171,10 +174,11 @@ int main(void)
     ImGui_ImplOpenGL3_Init("#version 330 core");
 
 
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     Scene scene1;
     Scene::active_scene = &scene1;
-    glfwSetCursorPosCallback(window, Scene::mouse_callback_dispacth);
+    //TODO : Active Scene should be handled by a window class not passing the window itself
+    Scene::active_scene->ToggleFPSMode(window); 
 
     //Create Shaders
     // Shader BasicShader("res\\shaders\\basic.glsl",ShaderType::Basic); //Basic Phong Shader
@@ -195,40 +199,19 @@ int main(void)
     //Setup Lights
     //PointLight * light1 = LightManager::Get()->CreatePointLight(glm::vec3(0, 10.0f, 2.0f), glm::vec3(1.0f, 1.0f, 1.0f), &LightShader);
 
-    DirectionalLight* light2 = LightManager::Get()->CreateDirectionalLight(glm::vec3(0, 0, -2.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    //DirectionalLight* light2 = LightManager::Get()->CreateDirectionalLight(glm::vec3(0, 0, -2.0f), glm::vec3(0.10f, 0.10f, 0.10f));
 
     LightManager::Get()->AffectShader(&BasicBlinnShader);
 
-    //Create Model
-    //Model testmodel("res/models/backpack/backpack.obj");
-    /*Model testmodel("res/models/modern_chair/modern chair 11 obj.obj");
-    testmodel.SetScale(glm::vec3(.05f, 0.05, 0.05));
-    testmodel.SetPosition(glm::vec3(0, 2, 0));
-    testmodel.SetShader(&BasicBlinnShader);*/
 
-    Model cubetestmodel;
+    Cube cubetestmodel("BrickCube");
     cubetestmodel.SetRotation(glm::vec3(90, 0, 0));
     cubetestmodel.SetPosition(glm::vec3(0, 3, -3.5f));
     cubetestmodel.SetScale(glm::vec3(10.0f, 1, 10));
 
-    Model naruto("res/models/naruto/D0401253.obj");
+    Model naruto("res/models/naruto/D0401253.obj","Naruto");
     naruto.SetScale(glm::vec3(0.1f, 0.1f, 0.1f));
     naruto.SetPosition(glm::vec3(0, 1, 0));
-    
-    //Create Cubemap
-    std::vector<std::string> faces = 
-    {
-        "right.jpg",
-        "left.jpg",
-        "top.jpg",
-        "bottom.jpg",
-        "front.jpg",
-        "back.jpg"
-    };
-    CubeMap cube_map("res/skybox/skybox1/",faces);
-
-    //Create Skybox
-    //Skybox skybox(&cube_map, &SkyboxShader); //Skybox Class taking the cubemap and the shader to render
 
     //Util
     float deltatime = 0.0f;	// Time between current frame and last frame
@@ -254,27 +237,36 @@ int main(void)
     scene1.AddModel(&cubetestmodel);
 
     glEnable(GL_DEPTH_TEST);
+    bool* selected = new bool;
+    *selected = false;
     while (!glfwWindowShouldClose(window))
     {
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-        // 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
+        // 1. List Models
         {
-            static float f = 0.0f;
             static int counter = 0;
 
-            ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-
-            ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+            ImGui::Begin("Models");
             
+            for (auto model : Scene::active_scene->m_Models)
+            {
 
-            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-            if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-                counter++;
+                if (ImGui::Selectable(model->GetName().c_str(), selected))
+                {
+                    *selected = true;
+                }
+            }
+
+            if (ImGui::Button("Add Light"))
+            {
+                LightManager::Get()->CreatePointLight(cam.m_CamPos, glm::vec3(10.0f, 10.0f, 10.0f), &LightShader);
+                LightManager::Get()->AffectShader(&BasicBlinnShader);
+            }
             ImGui::SameLine();
-            ImGui::Text("counter = %d", counter);
+            ImGui::Text("Models = %d", counter);
 
             ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
             ImGui::End();
@@ -284,6 +276,7 @@ int main(void)
         deltatime = currentFrame - lastFrame;
         lastFrame = currentFrame;
         fps = 1 / deltatime;
+
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
             cam.Forward(deltatime);
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -292,6 +285,11 @@ int main(void)
             cam.Left(deltatime);
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
             cam.Right(deltatime);
+        if (glfwGetKey(window, GLFW_KEY_T) == GLFW_PRESS)
+        {
+            Scene::active_scene->ToggleFPSMode(window);
+        }
+
         if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
         {
             //light1->UpdatePosition(1.2 * deltatime);

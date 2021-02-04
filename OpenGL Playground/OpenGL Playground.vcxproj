@@ -158,6 +158,7 @@
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\Scene.cpp" />
     <ClCompile Include="src\Shader.cpp" />
+    <ClCompile Include="src\Shapes.cpp" />
     <ClCompile Include="src\Skybox.cpp" />
     <ClCompile Include="src\Texture2D.cpp" />
     <ClCompile Include="src\vendor\imgui\imgui.cpp" />
@@ -183,6 +184,7 @@
     <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\Shader.h" />
+    <ClInclude Include="src\Shapes.h" />
     <ClInclude Include="src\Skybox.h" />
     <ClInclude Include="src\Texture2D.h" />
     <ClInclude Include="src\vendor\imgui\imconfig.h" />

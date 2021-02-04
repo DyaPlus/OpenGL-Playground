@@ -17,10 +17,11 @@
 
 class Model
 {
-private:
+protected:
     // model data
     std::vector<Mesh> m_Meshes;
     std::string m_Directory;
+    std::string m_Name;
     std::vector<Texture2D*> m_TexturesLoaded;
     void loadModel(std::string path);
     void processNode(aiNode* node, const aiScene* scene);
@@ -29,15 +30,15 @@ private:
 public:
     //TODO : find a better way to pass
     std::vector<Material*> m_MaterialsCreated;//For adding already created models to the active scene the model was added into
-    Model(std::string path);
-    Model(); //Create A Cube
+    Model(std::string path,std::string name);
+    Model(std::string name); //Create A Custom Shape
 
     //Public Methods
     void Render();
     void SetPosition(glm::vec3 trans);
     void SetScale(glm::vec3 scale);
     void SetRotation(glm::vec3 rotation);
-
+    std::string GetName();
     //Utilities
     unsigned int GetNumMeshes() const;
     Mesh GetMesh(unsigned int number) const;
