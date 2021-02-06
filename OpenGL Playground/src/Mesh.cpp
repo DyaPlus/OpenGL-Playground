@@ -78,10 +78,6 @@ Mesh::Mesh(std::vector<Vertex> vertices, Material* material)
 void Mesh::SetMat(Material* mat)
 {
     m_Material = mat;
-    //TODO : shader dependent code
-    m_Material->m_ShaderToUse->SetInteger("material.diffuse", 0);
-    m_Material->m_ShaderToUse->SetInteger("material.specular", 1);
-    m_Material->m_ShaderToUse->SetInteger("material.normal", 2);
 }
 
 void Mesh::SetPosition(glm::vec3 new_pos)
@@ -157,6 +153,27 @@ void Mesh::Render()
 
     glBindVertexArray(0);
     m_Material->m_ShaderToUse->Unbind();
+    glActiveTexture(GL_TEXTURE0); //Reset default texture unit
+}
+
+void Mesh::DrawWithShader(Shader* shader)
+{
+    glBindVertexArray(m_ID);
+
+    m_Material->BindValuesToShader(shader);
+
+    shader->Bind();
+    if (m_Indexed)
+    {
+        glDrawElements(GL_TRIANGLES, m_Indices.size(), GL_UNSIGNED_INT, 0);
+    }
+    else
+    {
+        glDrawArrays(GL_TRIANGLES, 0, m_Vertices.size());
+    }
+
+    glBindVertexArray(0);
+    shader->Unbind();
     glActiveTexture(GL_TEXTURE0); //Reset default texture unit
 }
 

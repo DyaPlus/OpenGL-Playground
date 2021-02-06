@@ -35,9 +35,11 @@ public:
 
     //Public Methods
     void Render();
+    void DrawWithShader(Shader* shader);
     void SetPosition(glm::vec3 trans);
     void SetScale(glm::vec3 scale);
     void SetRotation(glm::vec3 rotation);
+    void SetMaterial(Material* mat);
     std::string GetName();
     //Utilities
     unsigned int GetNumMeshes() const;

@@ -15,25 +15,21 @@
 #include "light/LightManager.h"
 
 //IMGUI
-#include "vendor/imgui/imgui.h"
-#include "vendor/imgui/imgui_impl_glfw.h"
-#include "vendor/imgui/imgui_impl_opengl3.h"
+#include "GUI.h"
+
 
 #include "Material.h"
 
 int width = 1024;
 int height = 768;
+static GLFWwindow* active_window;
 // Projection matrix : 45° Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
 //glm::mat4 Projection = glm::perspective(glm::radians(90.0f), (float)width / (float)height, 0.1f, 100.0f);
 //GLuint quadVAO = 0 ;
 //GLuint quadVBO = 0;
 
-Camera cam(glm::vec3(0.0f, 0.0f, 4.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), 3.5f);
+Camera cam(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), 3.5f);
 
-void boom()
-{
-    ImGui::Text("Models = %d",10);
-}
 //void RenderLightPOV(DirectionalLight* light,Model model, Shader* shader)
 //{
 //    glActiveTexture(GL_TEXTURE10);
@@ -147,6 +143,7 @@ void InitGLEW()
     if (glewInit() != GLEW_OK) {
         fprintf(stderr, "Failed to initialize GLEW\n");
     }
+    //glViewport(0, 0, width, height);
 }
 
 int main(void)
@@ -161,18 +158,13 @@ int main(void)
         return -1;
     }
     glfwMakeContextCurrent(window); 
+    active_window = window;
     //GLEW Init
     InitGLEW();
 
-    //IMGUI Init
-    // Setup Dear ImGui context
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
     // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330 core");
-
 
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     Scene scene1;
@@ -194,15 +186,16 @@ int main(void)
     Texture2D CeramicSpec("res\\Tiles_035_roughness.jpg", TextureType::SPECULAR);
 
     //Create Materials
-    Material CeramicMat( &Ceramic, &CeramicSpec,32.0f);
+    Material* WhiteMat = new Material();
 
     //Setup Lights
     //PointLight * light1 = LightManager::Get()->CreatePointLight(glm::vec3(0, 10.0f, 2.0f), glm::vec3(1.0f, 1.0f, 1.0f), &LightShader);
 
-    //DirectionalLight* light2 = LightManager::Get()->CreateDirectionalLight(glm::vec3(0, 0, -2.0f), glm::vec3(0.10f, 0.10f, 0.10f));
+    DirectionalLight* light2 = LightManager::Get()->CreateDirectionalLight(glm::vec3(0, 0, -2.0f), glm::vec3(3, 3, 3));
 
+    //TODO : find a better lighting binding operation
     LightManager::Get()->AffectShader(&BasicBlinnShader);
-
+    LightManager::Get()->AffectShader(ShaderManager::ExtractBrightnessShader);
 
     Cube cubetestmodel("BrickCube");
     cubetestmodel.SetRotation(glm::vec3(90, 0, 0));
@@ -213,6 +206,8 @@ int main(void)
     naruto.SetScale(glm::vec3(0.1f, 0.1f, 0.1f));
     naruto.SetPosition(glm::vec3(0, 1, 0));
 
+    Cube whitecube("LightCube");
+    whitecube.SetMaterial(WhiteMat);
     //Util
     float deltatime = 0.0f;	// Time between current frame and last frame
     float lastFrame = 0.0f; // Time of last frame
@@ -234,6 +229,7 @@ int main(void)
     scene1.AddCamera(&cam);
     scene1.AddShader(&BasicBlinnShader);
     scene1.AddModel(&naruto);
+    scene1.AddModel(&whitecube);
     scene1.AddModel(&cubetestmodel);
 
     glEnable(GL_DEPTH_TEST);
@@ -241,36 +237,34 @@ int main(void)
     *selected = false;
     while (!glfwWindowShouldClose(window))
     {
-        // Start the Dear ImGui frame
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-        // 1. List Models
-        {
-            static int counter = 0;
+        
+        //// 1. List Models
+        //{
+        //    static int counter = 0;
 
-            ImGui::Begin("Models");
-            
-            for (auto model : Scene::active_scene->m_Models)
-            {
+        //    ImGui::Begin("Models");
+        //    
+        //    for (auto model : Scene::active_scene->m_Models)
+        //    {
 
-                if (ImGui::Selectable(model->GetName().c_str(), selected))
-                {
-                    *selected = true;
-                }
-            }
+        //        if (ImGui::Selectable(model->GetName().c_str(), selected))
+        //        {
+        //            *selected = true;
+        //        }
+        //    }
 
-            if (ImGui::Button("Add Light"))
-            {
-                LightManager::Get()->CreatePointLight(cam.m_CamPos, glm::vec3(10.0f, 10.0f, 10.0f), &LightShader);
-                LightManager::Get()->AffectShader(&BasicBlinnShader);
-            }
-            ImGui::SameLine();
-            ImGui::Text("Models = %d", counter);
+        //    if (ImGui::Button("Add Light"))
+        //    {
+        //        LightManager::Get()->CreatePointLight(cam.m_CamPos, glm::vec3(10.0f, 10.0f, 10.0f), &LightShader);
+        //        LightManager::Get()->AffectShader(&BasicBlinnShader);
+        //    }
+        //    ImGui::SameLine();
+        //    ImGui::Text("Models = %d", counter);
 
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-            ImGui::End();
-        }
+        //    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+        //    ImGui::End();
+        //}
+
 
         float currentFrame = glfwGetTime();
         deltatime = currentFrame - lastFrame;
@@ -334,25 +328,19 @@ int main(void)
 
 		// Draw 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        scene1.UpdateDeltatime(deltatime);
-        scene1.Render();
-        // Rendering
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        Scene::active_scene->UpdateDeltatime(deltatime);
+        Scene::active_scene->Render(true);
 
         //drawShadowMap(light2, &ShadowShader); //To draw the shadowDepth map
+        GUI::GUI_Instance->StartFrame();
 
+        GUI::GUI_Instance->EndFrame();
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
-
         /* Poll for and process events */
         glfwPollEvents();
-		
     }
-    // Cleanup
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
+    
 
     glfwDestroyWindow(window);
     glfwTerminate();

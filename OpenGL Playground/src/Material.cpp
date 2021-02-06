@@ -87,3 +87,31 @@ void Material::BindValues()
         m_ShaderToUse->SetFloat("material.shininess", m_Shininess);
     }
 }
+
+void Material::BindValuesToShader(Shader* shader)
+{
+
+    //TODO : Introduce better abstraction for specific shader code
+    //The material assumes a Blinn Phong shader
+    
+    shader->SetVector3("material.Kd", m_Diffuse);
+    shader->SetVector3("material.Ks", m_Specular);
+    shader->SetInteger("material.mapping", m_IsMapped);
+    if (m_IsMapped & 0b100)
+    {
+        glActiveTexture(GL_TEXTURE0); //Activate 0 for diffuse
+        m_DiffuseMap->Bind();
+    }
+    if (m_IsMapped & 0b010)
+    {
+        glActiveTexture(GL_TEXTURE1); //Activate 1 for diffuse
+        m_SpecularMap->Bind();
+    }
+    if (m_IsMapped & 0b001)
+    {
+        glActiveTexture(GL_TEXTURE2); //Activate 2 for normal
+        m_NormalMap->Bind();
+    }
+    shader->SetFloat("material.shininess", m_Shininess);
+
+}

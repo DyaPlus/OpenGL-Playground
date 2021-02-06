@@ -36,6 +36,7 @@ public:
 
 	glm::mat4 ModelMat();
 	void Render();
+	void DrawWithShader(Shader* shader);
 	~Mesh();
 };
 

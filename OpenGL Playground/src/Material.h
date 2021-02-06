@@ -47,6 +47,7 @@ public:
     void RemoveNormalMap();
 
     void BindValues(); // TODO : should be handled by global shader setup entity as it is shader specific code
+    void BindValuesToShader(Shader* shader);
 };
 
 #endif

@@ -11,13 +11,13 @@ Texture2D::Texture2D(const char* filepath , TextureType type)
 
     // set the texture wrapping/filtering options (on the currently bound texture object)
     //TODO Change by additional methods
+    glBindTexture(GL_TEXTURE_2D, texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     // load and generate the texture
     Image tex = load_image(filepath);
-    glBindTexture(GL_TEXTURE_2D, texture);
     if (tex.data)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, tex.width, tex.height, 0, GL_RGB, GL_UNSIGNED_BYTE, tex.data);

@@ -157,6 +157,14 @@ void Model::Render()
     }
 }
 
+void Model::DrawWithShader(Shader* shader)
+{
+    for (unsigned int i = 0; i < m_Meshes.size(); i++)
+    {
+        m_Meshes[i].DrawWithShader(shader);
+    }
+}
+
 void Model::SetPosition(glm::vec3 trans)
 {
     for (auto& mesh : m_Meshes)
@@ -178,6 +186,15 @@ void Model::SetRotation(glm::vec3 rotation)
     for (auto& mesh : m_Meshes)
     {
         mesh.SetRotation(rotation);
+    }
+}
+
+void Model::SetMaterial(Material* mat)
+{
+    m_MaterialsCreated.push_back(mat);
+    for (auto& mesh : m_Meshes)
+    {
+        mesh.SetMat(mat);
     }
 }
 

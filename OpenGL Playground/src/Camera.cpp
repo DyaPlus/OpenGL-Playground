@@ -14,7 +14,7 @@ Camera::Camera(glm::vec3 pos, glm::vec3 front, glm::vec3 up,float speed)
 	front = glm::normalize(front);
     assert(front.x != 0 || front.z != 0);
 	m_Pitch = glm::degrees(asin(front.y)); //TODO make sure the returned value is degree not radian
-    m_Projection = glm::perspective(glm::radians(90.0f), (float)1024 / (float)768, 0.1f, 100.0f);
+    m_Projection = glm::perspective(glm::radians(90.0f), (float)1024 / (float)768, 0.1f, 90.0f);
 
     if (front.x)
     {

@@ -2,6 +2,13 @@
 
 Scene* Scene::active_scene;
 
+Scene::Scene()
+{
+    ShaderManager::Init();
+    Bloom::Init();
+    ScreenQuad::Init();
+}
+
 void Scene::AddModel(Model* model)
 {
     //TODO : Very bad code -> -> -> 
@@ -28,13 +35,45 @@ void Scene::AddShader(Shader* shader)
     m_Shaders.push_back(shader);
 }
 
-void Scene::Render()
+//TODO : refactor to support more post processing
+
+void Scene::Render(bool ppfx = false)
 {
-    for (auto model : m_Models)
+    if (ppfx)
     {
-        UpdateShaderParameters(model);
-        model->Render();
+        Bloom::Setup();
+        Shader* bloom_shader = Bloom::GetShader();
+        for (auto model : m_Models)
+        {
+            UpdateShaderParametersinShader(model, bloom_shader);
+            model->DrawWithShader(bloom_shader);
+        }
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        Bloom::Apply();
+        /*Bloom::BindRenderedTexture();
+        ShaderManager::QuadShader->Bind();
+        ScreenQuad::Render();
+        ShaderManager::QuadShader->Unbind();*/
+        ShaderManager::PostProcShader->Bind();
+        ScreenQuad::Render();
+        ShaderManager::PostProcShader->Unbind();
+
     }
+    else
+    {
+        for (auto model : m_Models)
+        {
+            UpdateShaderParameters(model);
+            model->Render();
+        }
+    }
+}
+
+
+
+void Scene::OnGuiUpdate()
+{
+
 }
 
 void Scene::OnUpdate()
@@ -57,6 +96,20 @@ void Scene::UpdateShaderParameters(Model* model)
             model->GetMesh(i).m_Material->m_ShaderToUse->SetMatrix4("Model", Model);
             model->GetMesh(i).m_Material->m_ShaderToUse->SetVector3("camPos", m_ActiveCamera->m_CamPos);
         }
+    }
+}
+void Scene::UpdateShaderParametersinShader(Model* model,Shader* shader)
+{
+    for (int i = 0; i < model->GetNumMeshes(); ++i)
+    {
+        glm::mat4 Model = model->GetMesh(i).ModelMat();
+        glm::mat4 View = m_ActiveCamera->ViewMat();
+        glm::mat4 MVP = m_ActiveCamera->ProjectionMat() * View * Model;
+
+        //Shader dependent code (TODO : Introduce a better abstraction)
+        shader->SetMatrix4("MVP", MVP);
+        shader->SetMatrix4("Model", Model);
+        shader->SetVector3("camPos", m_ActiveCamera->m_CamPos);
     }
 }
 

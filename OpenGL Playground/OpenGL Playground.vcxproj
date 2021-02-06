@@ -146,8 +146,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Bloom.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\CubeMap.cpp" />
+    <ClCompile Include="src\GUI.cpp" />
     <ClCompile Include="src\ImageLoader.cpp" />
     <ClCompile Include="src\light\LightManager.cpp" />
     <ClCompile Include="src\light\PointLight.cpp" />
@@ -157,6 +159,7 @@
     <ClCompile Include="src\light\DirectionalLight.cpp" />
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\Scene.cpp" />
+    <ClCompile Include="src\ScreenQuad.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\Shapes.cpp" />
     <ClCompile Include="src\Skybox.cpp" />
@@ -172,9 +175,11 @@
     <ClCompile Include="src\‏‏CubeVertices.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Bloom.h" />
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\CubeMap.h" />
     <ClInclude Include="src\CubeVertices.h" />
+    <ClInclude Include="src\GUI.h" />
     <ClInclude Include="src\ImageLoader.h" />
     <ClInclude Include="src\light\LightManager.h" />
     <ClInclude Include="src\light\PointLight.h" />
@@ -183,6 +188,7 @@
     <ClInclude Include="src\light\DirectionalLight.h" />
     <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\Scene.h" />
+    <ClInclude Include="src\ScreenQuad.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\Shapes.h" />
     <ClInclude Include="src\Skybox.h" />

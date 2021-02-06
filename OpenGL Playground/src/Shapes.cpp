@@ -3,7 +3,7 @@
 #include "CubeVertices.h"
 
 Cube::Cube(std::string name)
-    : Model( name)
+    : Model(name)
 {
     Texture2D* DefaultTex = new Texture2D("res/default/texture/def2_COLOR.jpg", TextureType::DIFFUSE);
     Texture2D* DefaultTexSpec = new Texture2D("res/default/texture/def_SPECULAR.jpg", TextureType::SPECULAR);

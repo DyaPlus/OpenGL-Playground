@@ -17,7 +17,7 @@ struct ShaderSource {
 
 enum class ShaderType
 {
-	Basic , Light
+	Basic , Light , Bloom ,
 };
 
 class Shader {
@@ -27,6 +27,7 @@ private:
 	std::unordered_map<std::string , GLuint> m_UniformLocationCache;
 	ShaderType m_Type;
 public:
+	Shader() = default;
 	GLuint m_ID;
 	Shader(const std::string& filepath , ShaderType type);
 	Shader(const ShaderSource src_code, ShaderType type);
@@ -38,6 +39,15 @@ public:
 
 	void Bind() const;
 	void Unbind() const;
+};
+
+struct ShaderManager
+{
+	static void Init();
+	static Shader* ExtractBrightnessShader;
+	static Shader* GaussianShader;
+	static Shader* PostProcShader;
+	static Shader* QuadShader;
 };
 
 ShaderSource ParseShader(const std::string& filepath); //Parse a given shader file to a ShderSource Object
