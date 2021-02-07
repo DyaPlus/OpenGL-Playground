@@ -3,9 +3,12 @@
 void Material::SetShader(Shader* shader) //TODO : It is currently the only way to bind a shader to the material #LAME
 {
     m_ShaderToUse = shader;
-    shader->SetInteger("material.diffuse", 0);
-    shader->SetInteger("material.specular", 1);
-    shader->SetInteger("material.normal", 2);
+    if (shader->GetType() == ShaderType::Basic)
+    {
+        shader->SetInteger("material.diffuse", 0);
+        shader->SetInteger("material.specular", 1);
+        shader->SetInteger("material.normal", 2);
+    }
 }
 
 void Material::SetDiffuseMap(Texture2D* diffuse)
@@ -86,6 +89,10 @@ void Material::BindValues()
         }
         m_ShaderToUse->SetFloat("material.shininess", m_Shininess);
     }
+    if (m_ShaderToUse->GetType() == ShaderType::Light)
+    {
+        
+    }
 }
 
 void Material::BindValuesToShader(Shader* shader)
@@ -93,25 +100,26 @@ void Material::BindValuesToShader(Shader* shader)
 
     //TODO : Introduce better abstraction for specific shader code
     //The material assumes a Blinn Phong shader
-    
-    shader->SetVector3("material.Kd", m_Diffuse);
-    shader->SetVector3("material.Ks", m_Specular);
-    shader->SetInteger("material.mapping", m_IsMapped);
-    if (m_IsMapped & 0b100)
+    if (m_ShaderToUse->GetType() == ShaderType::Basic)
     {
-        glActiveTexture(GL_TEXTURE0); //Activate 0 for diffuse
-        m_DiffuseMap->Bind();
+        shader->SetVector3("material.Kd", m_Diffuse);
+        shader->SetVector3("material.Ks", m_Specular);
+        shader->SetInteger("material.mapping", m_IsMapped);
+        if (m_IsMapped & 0b100)
+        {
+            glActiveTexture(GL_TEXTURE0); //Activate 0 for diffuse
+            m_DiffuseMap->Bind();
+        }
+        if (m_IsMapped & 0b010)
+        {
+            glActiveTexture(GL_TEXTURE1); //Activate 1 for diffuse
+            m_SpecularMap->Bind();
+        }
+        if (m_IsMapped & 0b001)
+        {
+            glActiveTexture(GL_TEXTURE2); //Activate 2 for normal
+            m_NormalMap->Bind();
+        }
+        shader->SetFloat("material.shininess", m_Shininess);
     }
-    if (m_IsMapped & 0b010)
-    {
-        glActiveTexture(GL_TEXTURE1); //Activate 1 for diffuse
-        m_SpecularMap->Bind();
-    }
-    if (m_IsMapped & 0b001)
-    {
-        glActiveTexture(GL_TEXTURE2); //Activate 2 for normal
-        m_NormalMap->Bind();
-    }
-    shader->SetFloat("material.shininess", m_Shininess);
-
 }

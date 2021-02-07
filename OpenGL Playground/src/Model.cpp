@@ -149,6 +149,15 @@ Model::Model(std::string name)
     m_Name = name; //TODO : we default it to cube as it is currently used for GUI Listing
 }
 
+void Model::EnableInstancing()
+{
+    for (auto& mesh : m_Meshes)
+    {
+        mesh.EnableInstancing();;
+    }
+}
+
+
 void Model::Render()
 {
     for (unsigned int i = 0; i < m_Meshes.size(); i++)
@@ -191,6 +200,7 @@ void Model::SetRotation(glm::vec3 rotation)
 
 void Model::SetMaterial(Material* mat)
 {
+    m_MaterialsCreated.pop_back();
     m_MaterialsCreated.push_back(mat);
     for (auto& mesh : m_Meshes)
     {

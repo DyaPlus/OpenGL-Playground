@@ -17,11 +17,9 @@ public:
 	float m_Linear;
 	float m_Quadratic;
 public:
-	Shader* m_ShaderToUse;
-	PointLight(glm::vec3 pos, glm::vec3 color , Shader* shader);
+	PointLight(glm::vec3 pos, glm::vec3 color);
 	void SetMesh(Mesh* mesh);
 	void SetFalloffParam(float constant,float linear,float quad);
-	void AffectShader(const Shader& shader);
 	void UpdatePosition(float val);
 };
 #endif 

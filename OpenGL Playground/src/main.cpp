@@ -189,9 +189,9 @@ int main(void)
     Material* WhiteMat = new Material();
 
     //Setup Lights
-    //PointLight * light1 = LightManager::Get()->CreatePointLight(glm::vec3(0, 10.0f, 2.0f), glm::vec3(1.0f, 1.0f, 1.0f), &LightShader);
+    PointLight * light1 = LightManager::Get()->CreatePointLight(glm::vec3(0, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 
-    DirectionalLight* light2 = LightManager::Get()->CreateDirectionalLight(glm::vec3(0, 0, -2.0f), glm::vec3(3, 3, 3));
+    //DirectionalLight* light2 = LightManager::Get()->CreateDirectionalLight(glm::vec3(0, 0, -2.0f), glm::vec3(3, 3, 3));
 
     //TODO : find a better lighting binding operation
     LightManager::Get()->AffectShader(&BasicBlinnShader);
@@ -206,8 +206,8 @@ int main(void)
     naruto.SetScale(glm::vec3(0.1f, 0.1f, 0.1f));
     naruto.SetPosition(glm::vec3(0, 1, 0));
 
-    Cube whitecube("LightCube");
-    whitecube.SetMaterial(WhiteMat);
+    //Cube whitecube("LightCube");
+    //whitecube.SetMaterial(WhiteMat);
     //Util
     float deltatime = 0.0f;	// Time between current frame and last frame
     float lastFrame = 0.0f; // Time of last frame
@@ -229,7 +229,7 @@ int main(void)
     scene1.AddCamera(&cam);
     scene1.AddShader(&BasicBlinnShader);
     scene1.AddModel(&naruto);
-    scene1.AddModel(&whitecube);
+    //scene1.AddModel(&whitecube);
     scene1.AddModel(&cubetestmodel);
 
     glEnable(GL_DEPTH_TEST);
@@ -329,7 +329,7 @@ int main(void)
 		// Draw 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         Scene::active_scene->UpdateDeltatime(deltatime);
-        Scene::active_scene->Render(true);
+        Scene::active_scene->Render(false);
 
         //drawShadowMap(light2, &ShadowShader); //To draw the shadowDepth map
         GUI::GUI_Instance->StartFrame();

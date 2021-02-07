@@ -32,6 +32,7 @@ public:
     std::vector<Material*> m_MaterialsCreated;//For adding already created models to the active scene the model was added into
     Model(std::string path,std::string name);
     Model(std::string name); //Create A Custom Shape
+    void EnableInstancing();
 
     //Public Methods
     void Render();

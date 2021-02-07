@@ -3,6 +3,7 @@
 #include "Model.h"
 #include "Camera.h"
 #include "Shader.h"
+#include "light/LightManager.h"
 #include "Bloom.h"
 #include "ScreenQuad.h"
 #include "GLFW/glfw3.h"
@@ -32,6 +33,8 @@ public:
 
 	void UpdateShaderParameters(Model* model);
 	void UpdateShaderParametersinShader(Model* model, Shader* shader);
+	void UpdateGlobalShadersParameters();
+	void UpdateShaderParametersInShader(Shader* shader); //TODO : scene need to know if the shader requires specific data
 	void Render(bool ppfx);
 
 	void ToggleFPSMode(GLFWwindow* window);

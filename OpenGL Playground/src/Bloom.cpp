@@ -62,6 +62,10 @@ void Bloom::Init()
 
     ShaderManager::PostProcShader->SetInteger("renderedSceneTex",0);
     ShaderManager::PostProcShader->SetInteger("bloomTex", 1);
+    
+    ShaderManager::ExtractBrightnessShader->SetInteger("material.diffuse", 0);
+    ShaderManager::ExtractBrightnessShader->SetInteger("material.specular", 1);
+    ShaderManager::ExtractBrightnessShader->SetInteger("material.normal", 2);
 }
 
 void Bloom::Setup()

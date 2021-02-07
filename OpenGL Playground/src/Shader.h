@@ -17,7 +17,7 @@ struct ShaderSource {
 
 enum class ShaderType
 {
-	Basic , Light , Bloom ,
+	Basic , Light , Bloom , PostProcessing
 };
 
 class Shader {
@@ -48,6 +48,7 @@ struct ShaderManager
 	static Shader* GaussianShader;
 	static Shader* PostProcShader;
 	static Shader* QuadShader;
+	static Shader* LightShader;
 };
 
 ShaderSource ParseShader(const std::string& filepath); //Parse a given shader file to a ShderSource Object

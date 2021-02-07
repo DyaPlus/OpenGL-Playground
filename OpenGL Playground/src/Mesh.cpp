@@ -2,6 +2,7 @@
 
 Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, Material* material)
 {
+    m_Instantiable = false; //TODO : Add a way to instantiate 
     m_Indexed = true;
     m_Vertices = vertices;
     m_Indices = indices;
@@ -39,10 +40,11 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, Mate
     m_ID = VAO;
 }
 
-Mesh::Mesh(std::vector<Vertex> vertices, Material* material)
+Mesh::Mesh(std::vector<Vertex> vertices, Material* material, unsigned int num_of_instances) 
 {
     m_Indexed = false;
     m_Vertices = vertices;
+    m_NumInstances = num_of_instances;
 
     m_Pos = glm::vec3(0.0f);
     m_Scale = glm::vec3(1.0f);
@@ -50,11 +52,13 @@ Mesh::Mesh(std::vector<Vertex> vertices, Material* material)
 
     m_Material = material;
     
+
     CalculateTangents();
 
     GLuint VAO;
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
+
 
     GLuint VBO;
     glGenBuffers(1, &VBO);
@@ -70,9 +74,42 @@ Mesh::Mesh(std::vector<Vertex> vertices, Material* material)
     glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, m_Tangent)); //Tangent vector
     glEnableVertexAttribArray(3);
 
+    if (num_of_instances)
+    {
+        m_Instantiable = true;
+        glGenBuffers(1, &m_InstanceVBO);
+        glBindBuffer(GL_ARRAY_BUFFER, m_InstanceVBO);
+        glBufferData(GL_ARRAY_BUFFER, MAX_INSTANCES * sizeof(glm::vec3), NULL, GL_STREAM_DRAW);
+        glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), 0); //Instance position
+        glVertexAttribDivisor(4, 1);
+        glEnableVertexAttribArray(4);
+    }
+    else
+    {
+        m_Instantiable = false;
+    }
+
     glBindVertexArray(0);
 
     m_ID = VAO;
+}
+
+
+void Mesh::EnableInstancing()
+{
+    if (m_Instantiable)
+        return;
+
+    m_Instantiable = true;
+    glBindVertexArray(m_ID);
+    glGenBuffers(1, &m_InstanceVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, m_InstanceVBO);
+    glBufferData(GL_ARRAY_BUFFER, MAX_INSTANCES * sizeof(glm::vec3), NULL, GL_STREAM_DRAW);
+    glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), 0); //Instance position
+    glVertexAttribDivisor(4, 1);
+    glEnableVertexAttribArray(4);
+    glBindVertexArray(0);
+
 }
 
 void Mesh::SetMat(Material* mat)
@@ -94,6 +131,19 @@ void Mesh::SetRotation(glm::vec3 new_rot)
 {
     new_rot = glm::vec3(glm::radians(new_rot.x), glm::radians(new_rot.y), glm::radians(new_rot.z));
     m_Rotation = new_rot;
+}
+
+void Mesh::SetInstancingData(glm::vec3* data, unsigned int num_of_instances)
+{
+    assert(m_Instantiable);
+    m_NumInstances = num_of_instances; //Update number of instances
+
+    glBindVertexArray(m_ID);
+    glBindBuffer(GL_ARRAY_BUFFER, m_InstanceVBO);
+    glBufferData(GL_ARRAY_BUFFER, MAX_INSTANCES * sizeof(glm::vec3), NULL, GL_STREAM_DRAW); // Buffer orphaning, a common way to improve streaming perf. See above link for details.
+    glBufferSubData(GL_ARRAY_BUFFER, 0, num_of_instances * sizeof(glm::vec3), data);
+    glBindVertexArray(0);
+
 }
 
 void Mesh::CalculateTangents() //NOTE : Used for un indexed meshes only , as the the indexed should be handled by the 3rd party model loader
@@ -148,7 +198,14 @@ void Mesh::Render()
     }
     else
     {
-        glDrawArrays(GL_TRIANGLES, 0, m_Vertices.size());
+        if (m_Instantiable)
+        {
+            glDrawArraysInstanced(GL_TRIANGLES, 0, m_Vertices.size(),m_NumInstances);
+        }
+        else
+        {
+            glDrawArrays(GL_TRIANGLES, 0, m_Vertices.size());
+        }
     }
 
     glBindVertexArray(0);

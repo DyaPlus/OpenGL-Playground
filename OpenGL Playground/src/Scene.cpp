@@ -66,6 +66,8 @@ void Scene::Render(bool ppfx = false)
             UpdateShaderParameters(model);
             model->Render();
         }
+        UpdateGlobalShadersParameters();
+        LightManager::Get()->RenderPointLights();
     }
 }
 
@@ -80,6 +82,7 @@ void Scene::OnUpdate()
 {
     
 }
+
 
 void Scene::UpdateShaderParameters(Model* model)
 {
@@ -100,17 +103,35 @@ void Scene::UpdateShaderParameters(Model* model)
 }
 void Scene::UpdateShaderParametersinShader(Model* model,Shader* shader)
 {
-    for (int i = 0; i < model->GetNumMeshes(); ++i)
+    if (shader->GetType() == ShaderType::Basic || shader->GetType() == ShaderType::Bloom)
     {
-        glm::mat4 Model = model->GetMesh(i).ModelMat();
-        glm::mat4 View = m_ActiveCamera->ViewMat();
-        glm::mat4 MVP = m_ActiveCamera->ProjectionMat() * View * Model;
+        for (int i = 0; i < model->GetNumMeshes(); ++i)
+        {
+            glm::mat4 Model = model->GetMesh(i).ModelMat();
+            glm::mat4 View = m_ActiveCamera->ViewMat();
+            glm::mat4 MVP = m_ActiveCamera->ProjectionMat() * View * Model;
 
-        //Shader dependent code (TODO : Introduce a better abstraction)
-        shader->SetMatrix4("MVP", MVP);
-        shader->SetMatrix4("Model", Model);
-        shader->SetVector3("camPos", m_ActiveCamera->m_CamPos);
+            //Shader dependent code (TODO : Introduce a better abstraction)
+            shader->SetMatrix4("MVP", MVP);
+            shader->SetMatrix4("Model", Model);
+            shader->SetVector3("camPos", m_ActiveCamera->m_CamPos);
+        }
     }
+    else if(shader->GetType() == ShaderType::Light)
+    {
+        //Shader dependent code (TODO : Introduce a better abstraction)
+        shader->SetMatrix4("View", m_ActiveCamera->ViewMat());
+        shader->SetMatrix4("Projection", m_ActiveCamera->ProjectionMat());   
+    }
+}
+
+void Scene::UpdateGlobalShadersParameters()
+{
+    //Shader dependent code (TODO : Introduce a better abstraction)
+    ShaderManager::LightShader->SetMatrix4("View", m_ActiveCamera->ViewMat());
+    ShaderManager::LightShader->SetMatrix4("Projection", m_ActiveCamera->ProjectionMat());
+
+
 }
 
 void Scene::UpdateDeltatime(float deltaTime)

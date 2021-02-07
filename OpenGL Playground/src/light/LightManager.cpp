@@ -1,8 +1,14 @@
 #include "LightManager.h"
 
+
 LightManager::LightManager()
 {
-
+	m_LightCube = new Cube("LightCube");
+	//TODO : cube size and position is controller totally by the point lights position and the shader itself
+	m_LightCube->EnableInstancing();
+	m_LightMaterial = new Material(); //Default Constructor Should be white mat
+	m_LightMaterial->SetShader(ShaderManager::LightShader); //Setting lightcube material to use global light shader
+	m_LightCube->SetMaterial(m_LightMaterial);
 }
 
 LightManager* LightManager::m_Instance = 0; //Actual Definition of the static member
@@ -15,10 +21,11 @@ LightManager* LightManager::Get()
 	return m_Instance;
 }
 
-PointLight* LightManager::CreatePointLight(glm::vec3 pos, glm::vec3 color, Shader* shader)
+PointLight* LightManager::CreatePointLight(glm::vec3 pos, glm::vec3 color)
 {
-	PointLight* light = new PointLight(pos, color, shader);
+	PointLight* light = new PointLight(pos, color);
 	m_PointLights.push_back(light);
+	m_PointLightPositions.push_back(pos);
 	return light;
 }
 
@@ -55,4 +62,18 @@ void LightManager::AffectShader(Shader* shader)
 	}
 	shader->SetInteger("shadowMap", 10);
 	shader->SetInteger("numberOfActiveDLights", m_DirectionalLights.size());
+}
+
+void LightManager::RenderPointLights()
+{
+	//TODO : its currently invoked every frame (LOL Gamed)
+	m_LightCube->SetInstancingData(m_PointLightPositions.data(), m_PointLightPositions.size());
+	m_LightCube->Render();
+}
+
+void LightManager::DrawPointLightsWithShader(Shader* shader)
+{
+	//TODO : its currently invoked every frame (LOL Gamed)
+	m_LightCube->SetInstancingData(m_PointLightPositions.data(), m_PointLightPositions.size());
+	m_LightCube->DrawWithShader(shader);
 }

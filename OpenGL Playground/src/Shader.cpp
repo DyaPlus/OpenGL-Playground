@@ -4,18 +4,15 @@ Shader* ShaderManager::GaussianShader = nullptr;
 Shader* ShaderManager::ExtractBrightnessShader = nullptr;
 Shader* ShaderManager::PostProcShader = nullptr;
 Shader* ShaderManager::QuadShader = nullptr;
+Shader* ShaderManager::LightShader = nullptr;
 
 void ShaderManager::Init()
 {
 	ExtractBrightnessShader = new Shader("res\\shaders\\basic2_bloom.glsl", ShaderType::Bloom);
-	GaussianShader = new Shader("res\\shaders\\op_gaussian.glsl", ShaderType::Bloom);
-	PostProcShader = new Shader("res\\shaders\\postprocessing.glsl", ShaderType::Basic);
+	GaussianShader = new Shader("res\\shaders\\op_gaussian.glsl", ShaderType::PostProcessing);
+	PostProcShader = new Shader("res\\shaders\\postprocessing.glsl", ShaderType::PostProcessing);
 	QuadShader = new Shader("res\\shaders\\quadrender.glsl", ShaderType::Basic);
-
-	//TODO : wtf is this lol 
-	ExtractBrightnessShader->SetInteger("material.diffuse", 0);
-	ExtractBrightnessShader->SetInteger("material.specular", 1);
-	ExtractBrightnessShader->SetInteger("material.normal", 2);
+	LightShader = new Shader("res\\shaders\\light.glsl", ShaderType::Light);
 }
 ShaderSource ParseShader(const std::string& filepath) //Parse a given shader file to a ShderSource Object
 {
