@@ -79,7 +79,10 @@ void Scene::Render(bool ppfx = false)
 
 void Scene::OnGuiUpdate()
 {
-
+    for (int i = 0;i<m_Models.size();++i)
+    {
+        m_Models[i]->OnGuiUpdate(i,&(m_GUIState.m_ModelSelected));
+    }
 }
 
 void Scene::OnUpdate()

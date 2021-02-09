@@ -153,6 +153,20 @@ void Model::EnableInstancing()
 }
 
 
+void Model::OnGuiUpdate(int id,int* selected)
+{
+    //ImGui::Begin("Models");
+    //bool selection_status = id == selected; // Used to impelement diselect functionality
+    //if (ImGui::Selectable(m_Name.c_str(), selection_status))
+    //{
+    //}
+    //if (selection_status)
+    //{
+    //    ImGui::Begin("Inspector",,ImGuiWindowFlags_)
+    //}
+    //ImGui::End();
+}
+
 void Model::Render()
 {
     for (unsigned int i = 0; i < m_Meshes.size(); i++)

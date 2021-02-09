@@ -6,6 +6,7 @@
 #include "Vertex.h"
 #include "Shader.h"
 #include "Mesh.h"
+#include "vendor/imgui/imgui.h"
 
 #define ASSIMP_DLL
 #include "vendor/assimp/Importer.hpp"
@@ -35,6 +36,7 @@ public:
     void EnableInstancing();
 
     //Public Methods
+    void OnGuiUpdate(int id, int* selected);
     void Render();
     void DrawWithShader(Shader* shader);
     void SetPosition(glm::vec3 trans);

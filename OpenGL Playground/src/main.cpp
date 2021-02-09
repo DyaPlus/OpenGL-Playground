@@ -334,7 +334,8 @@ int main(void)
 
         //drawShadowMap(light2, &ShadowShader); //To draw the shadowDepth map
         GUI::GUI_Instance->StartFrame();
-
+        ImGui::ShowDemoWindow();
+        GUI::GUI_Instance->OnUpdate();
         GUI::GUI_Instance->EndFrame();
         /* Swap front and back buffers */
         glfwSwapBuffers(window);

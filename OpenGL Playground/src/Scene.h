@@ -5,6 +5,7 @@
 #include "Shader.h"
 #include "light/LightManager.h"
 #include "Bloom.h"
+#include "GUIState.h"
 #include "ScreenQuad.h"
 #include "GLFW/glfw3.h"
 #include "vector"
@@ -18,6 +19,7 @@ private:
 	bool m_FPSMode = false;
 	Camera* m_ActiveCamera;
 	float m_DeltaTime;
+	GUIState m_GUIState;
 public:
 	std::vector<Model*> m_Models; //TODO : currently public for the GUI to grab models names , fix it boy
 	static Scene* active_scene;
