@@ -5,9 +5,9 @@
 Cube::Cube(std::string name,unsigned int num_of_instances)
     : Model(name)
 {
-    Texture2D* DefaultTex = new Texture2D("res/default/texture/def_COLOR.jpg", TextureType::DIFFUSE);
+    Texture2D* DefaultTex = new Texture2D("res/default/texture/def2_COLOR.jpg", TextureType::DIFFUSE);
     Texture2D* DefaultTexSpec = new Texture2D("res/default/texture/def_SPECULAR.jpg", TextureType::SPECULAR);
-    Texture2D* DefaultTexNormal = new Texture2D("res/default/texture/def_Normal.jpg", TextureType::NORMAL);
+    Texture2D* DefaultTexNormal = new Texture2D("res/default/texture/def2_Normal.jpg", TextureType::NORMAL);
     Material* mat = new Material();
     mat->SetDiffuseMap(DefaultTex);
     mat->SetNormalMap(DefaultTexNormal);

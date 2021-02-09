@@ -76,33 +76,28 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
         aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
         std::vector<Texture2D*> diffuseMaps = loadMaterialTextures(material,
             aiTextureType_DIFFUSE, TextureType::DIFFUSE);
-        if (diffuseMaps.size() == 0)
+
+        mat = new Material(); //TODO shininess should be choosable
+        if (diffuseMaps.size() != 0) 
         {
-            Texture2D DefaultTex("res/default/texture/def_COLOR.jpg", TextureType::DIFFUSE);
-            diffuseMaps.push_back(new Texture2D(DefaultTex));
+            mat->SetDiffuseMap(diffuseMaps[0]);
         }
         //textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
         std::vector<Texture2D*> specularMaps = loadMaterialTextures(material,
             aiTextureType_SPECULAR, TextureType::SPECULAR);
-        if (specularMaps.size() == 0)
+        if (specularMaps.size() != 0)
         {
-            Texture2D DefaultTexSpec("res/default/texture/def_SPECULAR.jpg", TextureType::SPECULAR);
-            specularMaps.push_back(new Texture2D(DefaultTexSpec));
+            mat->SetSpecularMap(specularMaps[0]);
         }
         //textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
-        mat = new Material(diffuseMaps[0], specularMaps[0], 32.0f); //TODO shininess should be choosable
     }
-    else //Default textures
-    {
-        Texture2D* DefaultTex = new Texture2D("res/default/texture/def2_COLOR.jpg", TextureType::DIFFUSE);
-        Texture2D* DefaultTexSpec = new Texture2D("res/default/texture/def_SPECULAR.jpg", TextureType::SPECULAR);
-        Texture2D* DefaultTexNormal = new Texture2D("res/default/texture/def2_Normal.jpg", TextureType::NORMAL);
-        
-        mat = new Material(DefaultTex, DefaultTexSpec , DefaultTexNormal, 1.0f);
+    else //Default Material
+    {   
+        mat = new Material();
     }
     
 
-    m_MaterialsCreated.push_back(mat); //TODO Model shouldnt hold info of the material
+    m_MaterialsCreated.push_back(mat); //TODO Scene Object should be the one to record created materials
     return Mesh(vertices, indices, mat);
 }
 

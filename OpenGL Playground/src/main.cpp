@@ -189,7 +189,8 @@ int main(void)
     Material* WhiteMat = new Material();
 
     //Setup Lights
-    PointLight * light1 = LightManager::Get()->CreatePointLight(glm::vec3(0, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    PointLight * light1 = LightManager::Get()->CreatePointLight(glm::vec3(0, 0.0f, 0.0f), glm::vec3(10.0f, 10.0f, 10.0f));
+    PointLight* light3 = LightManager::Get()->CreatePointLight(glm::vec3(0, 4.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 
     //DirectionalLight* light2 = LightManager::Get()->CreateDirectionalLight(glm::vec3(0, 0, -2.0f), glm::vec3(3, 3, 3));
 

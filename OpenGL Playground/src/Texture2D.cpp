@@ -20,7 +20,18 @@ Texture2D::Texture2D(const char* filepath , TextureType type)
     Image tex = load_image(filepath);
     if (tex.data)
     {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, tex.width, tex.height, 0, GL_RGB, GL_UNSIGNED_BYTE, tex.data);
+        if (m_Type == TextureType::DIFFUSE)
+        {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, tex.width, tex.height, 0, GL_RGB, GL_UNSIGNED_BYTE, tex.data);
+        }
+        else if (m_Type == TextureType::NORMAL)
+        {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, tex.width, tex.height, 0, GL_RGB, GL_UNSIGNED_BYTE, tex.data);
+        }
+        else if (m_Type == TextureType::SPECULAR)
+        {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, tex.width, tex.height, 0, GL_RGB, GL_UNSIGNED_BYTE, tex.data);
+        }
         glGenerateMipmap(GL_TEXTURE_2D);
     }
     else

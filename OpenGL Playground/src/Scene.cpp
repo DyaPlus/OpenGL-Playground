@@ -43,11 +43,15 @@ void Scene::Render(bool ppfx = false)
     {
         Bloom::Setup();
         Shader* bloom_shader = Bloom::GetShader();
+        //Draw Scene
         for (auto model : m_Models)
         {
             UpdateShaderParametersinShader(model, bloom_shader);
             model->DrawWithShader(bloom_shader);
         }
+        UpdateGlobalShadersParameters();
+        LightManager::Get()->RenderPointLights();
+        //////////
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         Bloom::Apply();
         /*Bloom::BindRenderedTexture();

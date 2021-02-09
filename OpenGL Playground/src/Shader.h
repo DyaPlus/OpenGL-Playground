@@ -49,6 +49,7 @@ struct ShaderManager
 	static Shader* PostProcShader;
 	static Shader* QuadShader;
 	static Shader* LightShader;
+
 };
 
 ShaderSource ParseShader(const std::string& filepath); //Parse a given shader file to a ShderSource Object
