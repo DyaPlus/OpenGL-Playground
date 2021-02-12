@@ -24,6 +24,10 @@ protected:
     std::string m_Directory;
     std::string m_Name;
     std::vector<Texture2D*> m_TexturesLoaded;
+    glm::vec3 m_Position;
+    glm::vec3 m_Scale;
+    glm::vec3 m_Rotation;
+
     void loadModel(std::string path);
     void processNode(aiNode* node, const aiScene* scene);
     Mesh processMesh(aiMesh* mesh, const aiScene* scene);

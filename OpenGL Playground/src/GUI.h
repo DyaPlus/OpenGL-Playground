@@ -10,13 +10,14 @@
 class GUI
 {
 private:
+	void ConstructDockspaceWindow();
 public:
 	static GUI* GUI_Instance;
 	
 	GUI();
-	~GUI();
 	void StartFrame();
 	void EndFrame();
 	void OnUpdate();
+	~GUI();
 
 };

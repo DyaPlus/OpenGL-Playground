@@ -140,6 +140,7 @@ Model::Model(std::string path, std::string name)
 }
 
 Model::Model(std::string name)
+    :m_Position(0,0,0), m_Scale(0, 0, 0), m_Rotation(0, 0, 0)
 {
     m_Name = name; //TODO : we default it to cube as it is currently used for GUI Listing
 }
@@ -155,16 +156,35 @@ void Model::EnableInstancing()
 
 void Model::OnGuiUpdate(int id,int* selected)
 {
-    //ImGui::Begin("Models");
-    //bool selection_status = id == selected; // Used to impelement diselect functionality
-    //if (ImGui::Selectable(m_Name.c_str(), selection_status))
-    //{
-    //}
-    //if (selection_status)
-    //{
-    //    ImGui::Begin("Inspector",,ImGuiWindowFlags_)
-    //}
-    //ImGui::End();
+    ImGui::Begin("Models");
+    bool selection_status = id == *selected; // Used to impelement diselect functionality
+
+
+    if (ImGui::Selectable(m_Name.c_str(), selection_status))
+    {
+        if(selection_status) //Deselect if already selected
+        {
+            *selected = -1;
+        }
+        else
+        {
+            *selected = id;
+        }
+    }
+
+    if (selection_status)
+    {
+        ImGui::Begin("Inspector");
+        ImGui::TextColored(ImVec4(0.4f, 0.4f, 1.0f, 1.0f), "Position:");
+        ImGui::SameLine();
+
+        if (ImGui::InputFloat3("", &m_Position[0],"%.3f",ImGuiInputTextFlags_EnterReturnsTrue))
+        {
+            SetPosition(m_Position); //TODO : setting the m_Position twice (ImGui , and the function)
+        }
+        ImGui::End();
+    }
+    ImGui::End();
 }
 
 void Model::Render()
@@ -185,6 +205,7 @@ void Model::DrawWithShader(Shader* shader)
 
 void Model::SetPosition(glm::vec3 trans)
 {
+    m_Position = trans;
     for (auto& mesh : m_Meshes)
     {
         mesh.SetPosition(trans);
@@ -193,6 +214,7 @@ void Model::SetPosition(glm::vec3 trans)
 
 void Model::SetScale(glm::vec3 scale)
 {
+    m_Scale = scale;
     for (auto& mesh : m_Meshes)
     {
         mesh.SetScale(scale);
@@ -201,6 +223,8 @@ void Model::SetScale(glm::vec3 scale)
 
 void Model::SetRotation(glm::vec3 rotation)
 {
+    m_Scale = rotation;
+
     for (auto& mesh : m_Meshes)
     {
         mesh.SetRotation(rotation);
