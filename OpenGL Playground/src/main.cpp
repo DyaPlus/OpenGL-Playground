@@ -174,7 +174,7 @@ int main(void)
 
     //Create Shaders
     // Shader BasicShader("res\\shaders\\basic.glsl",ShaderType::Basic); //Basic Phong Shader
-    Shader BasicBlinnShader("res\\shaders\\basic2.glsl", ShaderType::Basic); //Basic Blinn-Phong Shader
+    //Shader BasicBlinnShader("res\\shaders\\basic2.glsl", ShaderType::Basic); //Basic Blinn-Phong Shader
     Shader LightShader("res\\shaders\\light.glsl", ShaderType::Light);
     //Shader SkyboxShader("res\\shaders\\skybox_shader.glsl", ShaderType::Basic); //Box uses it to render skybox
     //Shader EnvMapShader("res\\shaders\\environment_map.glsl", ShaderType::Basic); //Model Uses it for EnvMap 
@@ -189,13 +189,13 @@ int main(void)
     Material* WhiteMat = new Material();
 
     //Setup Lights
-    //PointLight * light1 = LightManager::Get()->CreatePointLight(glm::vec3(0, 0.0f, 0.0f), glm::vec3(10.0f, 10.0f, 10.0f));
-    //PointLight* light3 = LightManager::Get()->CreatePointLight(glm::vec3(0, 4.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    PointLight * light1 = LightManager::Get()->CreatePointLight(glm::vec3(0, 0.0f, 0.0f), glm::vec3(10.0f, 10.0f, 10.0f));
+    PointLight* light3 = LightManager::Get()->CreatePointLight(glm::vec3(0, 4.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f));
 
-    DirectionalLight* light2 = LightManager::Get()->CreateDirectionalLight(glm::vec3(0, 0, -2.0f), glm::vec3(3, 3, 3));
+    //DirectionalLight* light2 = LightManager::Get()->CreateDirectionalLight(glm::vec3(0, 0, -2.0f), glm::vec3(3, 3, 3));
 
     //TODO : find a better lighting binding operation
-    LightManager::Get()->AffectShader(&BasicBlinnShader);
+    LightManager::Get()->AffectShader(ShaderManager::BasicShader);
     LightManager::Get()->AffectShader(ShaderManager::ExtractBrightnessShader);
 
     Cube cubetestmodel("BrickCube");
@@ -228,7 +228,6 @@ int main(void)
 
     //Configure Scene
     scene1.AddCamera(&cam);
-    scene1.AddShader(&BasicBlinnShader);
     scene1.AddModel(&naruto);
     //scene1.AddModel(&whitecube);
     scene1.AddModel(&cubetestmodel);

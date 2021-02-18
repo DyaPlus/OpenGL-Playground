@@ -15,7 +15,6 @@ class Scene
 {
 private:	
 	std::vector<Camera*> m_Cameras;
-	std::vector<Shader*> m_Shaders;
 	bool m_FPSMode = false;
 	Camera* m_ActiveCamera;
 	float m_DeltaTime;
@@ -26,7 +25,6 @@ public:
 	Scene();
 	void AddModel(Model* model);
 	void AddCamera(Camera* camera);
-	void AddShader(Shader* shader);
 
 
 	void OnGuiUpdate();

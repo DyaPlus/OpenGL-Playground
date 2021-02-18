@@ -17,7 +17,7 @@ void Scene::AddModel(Model* model)
     m_Models.push_back(model);
     for (int i = 0; i < model->m_MaterialsCreated.size(); i++)
     {
-        model->m_MaterialsCreated[i]->SetShader(m_Shaders[0]);
+        model->m_MaterialsCreated[i]->SetShader(ShaderManager::BasicShader); //Set Global Basic Shader
     }
 }
 
@@ -30,10 +30,6 @@ void Scene::AddCamera(Camera* camera)
     }
 }
 
-void Scene::AddShader(Shader* shader)
-{
-    m_Shaders.push_back(shader);
-}
 
 //TODO : refactor to support more post processing
 
@@ -83,6 +79,7 @@ void Scene::OnGuiUpdate()
     {
         m_Models[i]->OnGuiUpdate(i,&(m_GUIState.m_ModelSelected));
     }
+    LightManager::Get()->OnGuiUpdate();
 }
 
 void Scene::OnUpdate()

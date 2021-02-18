@@ -6,6 +6,8 @@
 #include "Vertex.h"
 #include "Shader.h"
 #include "Mesh.h"
+
+#include "GUIUtilities.h"
 #include "vendor/imgui/imgui.h"
 
 #define ASSIMP_DLL

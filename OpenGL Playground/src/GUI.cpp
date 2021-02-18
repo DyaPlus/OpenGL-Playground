@@ -144,7 +144,7 @@ void GUI::StartFrame()
 
     //Init Windows
 
-    ImGui::Begin("Models",&open , window_flags);
+    ImGui::Begin("Entities",&open , window_flags);
     ImGui::End();
     ImGui::Begin("Inspector", &open, window_flags);
     ImGui::End();

@@ -17,7 +17,7 @@ private:
 	std::vector<DirectionalLight*> m_DirectionalLights;
 	Cube* m_LightCube;
 	Material* m_LightMaterial;
-	std::vector<glm::vec3> m_PointLightPositions;
+	std::vector<glm::vec3> m_PointLightPositions; //used for instancing in the gpu
 public:
 	static LightManager* Get();
 	PointLight* CreatePointLight(glm::vec3 pos, glm::vec3 color);
@@ -25,7 +25,7 @@ public:
 	void AffectShader(Shader* shader);
 	void RenderPointLights();
 	void DrawPointLightsWithShader(Shader* shader);
-
+	void OnGuiUpdate();
 };
 
 #endif

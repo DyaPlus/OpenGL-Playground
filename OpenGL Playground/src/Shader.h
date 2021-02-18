@@ -44,6 +44,7 @@ public:
 struct ShaderManager
 {
 	static void Init();
+	static Shader* BasicShader;
 	static Shader* ExtractBrightnessShader;
 	static Shader* GaussianShader;
 	static Shader* PostProcShader;

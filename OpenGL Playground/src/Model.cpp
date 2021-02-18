@@ -140,7 +140,7 @@ Model::Model(std::string path, std::string name)
 }
 
 Model::Model(std::string name)
-    :m_Position(0,0,0), m_Scale(0, 0, 0), m_Rotation(0, 0, 0)
+    :m_Position(0,0,0), m_Scale(1, 1, 1), m_Rotation(0, 0, 0)
 {
     m_Name = name; //TODO : we default it to cube as it is currently used for GUI Listing
 }
@@ -156,7 +156,7 @@ void Model::EnableInstancing()
 
 void Model::OnGuiUpdate(int id,int* selected)
 {
-    ImGui::Begin("Models");
+    ImGui::Begin("Entities");
     bool selection_status = id == *selected; // Used to impelement diselect functionality
 
 
@@ -171,20 +171,37 @@ void Model::OnGuiUpdate(int id,int* selected)
             *selected = id;
         }
     }
+    ImGui::End();
 
     if (selection_status)
     {
         ImGui::Begin("Inspector");
-        ImGui::TextColored(ImVec4(0.4f, 0.4f, 1.0f, 1.0f), "Position:");
-        ImGui::SameLine();
-
-        if (ImGui::InputFloat3("", &m_Position[0],"%.3f",ImGuiInputTextFlags_EnterReturnsTrue))
+        if (ImGui::CollapsingHeader("Transform"))
         {
-            SetPosition(m_Position); //TODO : setting the m_Position twice (ImGui , and the function)
+            ImGui::PushID(1);
+            if (GUI_UT::InputFloat3("Position: ", &m_Position[0]));
+            {
+                SetPosition(m_Position);
+            }
+            ImGui::PopID();
+            ImGui::PushID(2);
+            if (GUI_UT::InputFloat3("Scale: ", &m_Scale[0]));
+            {
+                SetScale(m_Scale);
+            }
+            ImGui::PopID();
+            ImGui::PushID(3);
+
+            if (GUI_UT::InputFloat3("Rotation: ", &m_Rotation[0]));
+            {
+                SetRotation(m_Rotation);
+            }
+            ImGui::PopID();
         }
+
+
         ImGui::End();
     }
-    ImGui::End();
 }
 
 void Model::Render()
@@ -223,7 +240,7 @@ void Model::SetScale(glm::vec3 scale)
 
 void Model::SetRotation(glm::vec3 rotation)
 {
-    m_Scale = rotation;
+    m_Rotation = rotation;
 
     for (auto& mesh : m_Meshes)
     {

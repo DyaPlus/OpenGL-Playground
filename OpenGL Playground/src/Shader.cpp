@@ -1,5 +1,6 @@
 #include "Shader.h"
 	
+Shader* ShaderManager::BasicShader = nullptr;
 Shader* ShaderManager::GaussianShader = nullptr;
 Shader* ShaderManager::ExtractBrightnessShader = nullptr;
 Shader* ShaderManager::PostProcShader = nullptr;
@@ -8,12 +9,14 @@ Shader* ShaderManager::LightShader = nullptr;
 
 void ShaderManager::Init()
 {
+	BasicShader = new Shader("res\\shaders\\basic2.glsl", ShaderType::Basic);
 	ExtractBrightnessShader = new Shader("res\\shaders\\basic2_bloom.glsl", ShaderType::Bloom);
 	GaussianShader = new Shader("res\\shaders\\op_gaussian.glsl", ShaderType::PostProcessing);
 	PostProcShader = new Shader("res\\shaders\\postprocessing.glsl", ShaderType::PostProcessing);
 	QuadShader = new Shader("res\\shaders\\quadrender.glsl", ShaderType::Basic);
 	LightShader = new Shader("res\\shaders\\light.glsl", ShaderType::Light);
 }
+
 ShaderSource ParseShader(const std::string& filepath) //Parse a given shader file to a ShderSource Object
 {
 	std::ifstream stream(filepath, std::ios::in);

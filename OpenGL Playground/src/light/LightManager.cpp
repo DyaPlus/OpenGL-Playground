@@ -60,7 +60,7 @@ void LightManager::AffectShader(Shader* shader)
 		//TODO :: currently works for only one directional light
 		shader->SetMatrix4("lightSpaceMatrix", m_DirectionalLights[i]->m_LightSpaceMatrix);
 	}
-	shader->SetInteger("shadowMap", 10);
+	//shader->SetInteger("shadowMap", 10);
 	shader->SetInteger("numberOfActiveDLights", m_DirectionalLights.size());
 }
 
@@ -76,4 +76,43 @@ void LightManager::DrawPointLightsWithShader(Shader* shader)
 	//TODO : its currently invoked every frame (LOL Gamed)
 	m_LightCube->SetInstancingData(m_PointLightPositions.data(), m_PointLightPositions.size());
 	m_LightCube->DrawWithShader(shader);
+}
+
+void LightManager::OnGuiUpdate()
+{
+	static int selected = -1;
+	for (int i = 0;i < m_PointLights.size();i++)
+	{
+		ImGui::PushID(i);
+		ImGui::Begin("Entities");
+		bool selection_status = i == selected; // Used to impelement diselect functionality
+
+		if (ImGui::Selectable(("PointLight" + std::to_string(i)).c_str(), selection_status))
+		{
+			if (selection_status) //Deselect if already selected
+			{
+				selected = -1;
+			}
+			else
+			{
+				selected = i;
+			}
+		}
+		ImGui::End();
+		if (selection_status)
+		{
+			ImGui::Begin("Inspector");
+			if (ImGui::CollapsingHeader("Light Transform"))
+			{
+				if (GUI_UT::InputFloat3("Position: ", &(m_PointLights[i]->m_Pos[0])));
+				{
+					m_PointLightPositions[i] = m_PointLights[i]->m_Pos;
+					AffectShader(ShaderManager::BasicShader);
+				}
+			}
+
+			ImGui::End();
+		}
+		ImGui::PopID();
+	}
 }
